@@ -1,0 +1,87 @@
+<!DOCTYPE html> <html lang="en"> <head> <meta 
+  charset="UTF-8"> <title>Universal Video 
+  Downloader - YouTube & Instagram</title> 
+  <meta name="viewport" 
+  content="width=device-width, 
+  initial-scale=1.0"> <script 
+  src="https://cdn.tailwindcss.com"></script>
+</head> <body class="bg-gradient-to-br 
+from-gray-900 to-gray-700 text-white flex 
+flex-col items-center justify-center 
+min-h-screen p-5">
+  <div class="w-full text-center p-4 
+  rounded-b-xl bg-gradient-to-r 
+  from-yellow-400 to-yellow-600 text-gray-900 
+  font-bold text-2xl shadow-lg">
+    🚀 Universal Video Downloader </div> <form 
+  id="downloaderForm" class="flex flex-col 
+  space-y-3 mt-5 w-80 bg-gray-800 p-5 
+  rounded-xl shadow-lg">
+    <input id="url" placeholder="Paste YouTube 
+    or Instagram link" required class="p-3 
+    rounded text-gray-800 focus:outline-none 
+    focus:ring-2 focus:ring-yellow-400" /> 
+    <select id="site" class="p-3 rounded 
+    text-gray-800">
+      <option value="youtube">YouTube</option> 
+      <option 
+      value="instagram">Instagram</option>
+    </select> <select id="format" class="p-3 
+    rounded text-gray-800">
+      <option value="mp4">mp4 (Video)</option> 
+      <option value="mp3">mp3 (Audio, YouTube 
+      only)</option>
+    </select> <button type="submit" 
+    class="bg-yellow-400 hover:bg-yellow-500 
+    rounded p-3 text-gray-900 font-bold">
+      ⬇️ Download </button> </form> <div 
+  id="result" class="mt-5 text-center"></div> 
+  <script>
+    document.getElementById('downloaderForm').onsubmit 
+    = async function(e) {
+      e.preventDefault(); const url = 
+      document.getElementById('url').value.trim(); 
+      const site = 
+      document.getElementById('site').value; 
+      const format = 
+      document.getElementById('format').value; 
+      const resultDiv = 
+      document.getElementById('result'); 
+      resultDiv.innerHTML = "⏳ 
+      Processing...";
+      // Choose API based on site
+      let apiUrl = ""; if (site === "youtube") 
+      {
+        // vevioz.com API for YouTube
+        apiUrl = 
+        `https://api.vevioz.com/api/button/${format}?url=${encodeURIComponent(url)}`;
+      } else if (site === "instagram") {
+        // saveig.app API for Instagram 
+        // (public, works for reels, posts, 
+        // videos)
+        apiUrl = 
+        `https://saveig.app/en/download?url=${encodeURIComponent(url)}`;
+      }
+      if (site === "instagram") {
+        // For Instagram, just open the API 
+        // page in new tab
+        window.open(apiUrl, '_blank'); 
+        resultDiv.innerHTML = `🔗 If download 
+        doesn't start, <a class='underline 
+        text-yellow-300' href='${apiUrl}' 
+        target='_blank'>click here</a>.`;
+      } else if (site === "youtube") {
+        // For YouTube, open the API page in 
+        // new tab
+        window.open(apiUrl, '_blank'); 
+        resultDiv.innerHTML = `🔗 If download 
+        doesn't start, <a class='underline 
+        text-yellow-300' href='${apiUrl}' 
+        target='_blank'>click here</a>.`;
+      } else {
+        resultDiv.innerHTML = "❌ Only YouTube 
+        and Instagram supported!";
+      }
+    }
+  </script> </body>
+</html>
