@@ -11,7 +11,7 @@
     <div class="w-full text-center p-4 rounded-b-xl bg-gradient-to-r from-yellow-400 to-yellow-600 text-gray-900 font-bold text-2xl shadow-lg">
       🚀 Universal Video Downloader
     </div>
-    <form id="downloaderForm" class="flex flex-col space-y-3 mt-5 w-80 bg-gray-800 p-5 rounded-xl shadow-lg">
+    <form id="downloaderForm" class="flex flex-col space-y-3 mt-5 w-80 bg-gray-800 p-5 rounded-xl shadow-lg" autocomplete="off">
       <input id="url" placeholder="Paste YouTube or Instagram link" required class="p-3 rounded text-gray-800 focus:outline-none focus:ring-2 focus:ring-yellow-400" />
       <select id="site" class="p-3 rounded text-gray-800">
         <option value="youtube">YouTube</option>
@@ -36,7 +36,6 @@
     const resultDiv = document.getElementById('result');
     const form = document.getElementById('downloaderForm');
 
-    // Show/Hide quality option based on site
     function resetQuality() {
       qualityInput.innerHTML = '';
       qualityInput.classList.add('hidden');
@@ -44,18 +43,15 @@
 
     async function fetchYoutubeQualities(videoURL, format) {
       resultDiv.innerHTML = '🔎 Fetching qualities...';
-      // vevioz.com API returns a page with download buttons, so we fetch & parse
       const apiUrl = `https://api.vevioz.com/api/button/${format}?url=${encodeURIComponent(videoURL)}`;
       try {
         const res = await fetch(apiUrl, {mode: 'cors'});
         const html = await res.text();
-        // Parse qualities from the HTML
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
         const buttons = Array.from(doc.querySelectorAll('.download-mp4, .download-mp3, .download-audio, .download-video'));
         let opts = [];
         for (const btn of buttons) {
-          // Example: "Download (720p) - 150MB"
           let text = btn.textContent.trim();
           let href = btn.getAttribute('href');
           if (href && text) {
@@ -108,34 +104,45 @@
       const url = urlInput.value.trim();
       const site = siteInput.value;
       const format = formatInput.value;
-      resultDiv.innerHTML = "⏳ Processing...";
       if (!url) {
         resultDiv.innerHTML = "❌ Please enter a link!";
         return;
       }
-      // --- YOUTUBE ---
+      // YOUTUBE
       if (site === "youtube") {
-        // If qualities loaded, use selected
         if (!qualityInput.classList.contains('hidden')) {
           const opts = JSON.parse(qualityInput.dataset.options || '[]');
           const selected = qualityInput.selectedIndex;
           if (opts[selected]) {
-            window.open(opts[selected].href, '_blank');
-            resultDiv.innerHTML = `🔗 Download should start automatically. If not, <a class='underline text-yellow-300' href='${opts[selected].href}' target='_blank'>click here</a>.`;
+            // Try to open in new tab for download
+            let win = window.open(opts[selected].href, '_blank');
+            if(!win){
+              resultDiv.innerHTML = `❗ Popup blocked! Please allow popups for this site. Or <a class='underline text-yellow-300' href='${opts[selected].href}' target='_blank'>click here</a>.`;
+            }else{
+              resultDiv.innerHTML = `🔗 Download should start automatically. If not, <a class='underline text-yellow-300' href='${opts[selected].href}' target='_blank'>click here</a>.`;
+            }
             return;
           }
         }
-        // Else (no qualities), fallback
+        // fallback
         const apiUrl = `https://api.vevioz.com/api/button/${format}?url=${encodeURIComponent(url)}`;
-        window.open(apiUrl, '_blank');
-        resultDiv.innerHTML = `🔗 If download doesn't start, <a class='underline text-yellow-300' href='${apiUrl}' target='_blank'>click here</a>.`;
+        let win = window.open(apiUrl, '_blank');
+        if(!win){
+          resultDiv.innerHTML = `❗ Popup blocked! Please allow popups for this site. Or <a class='underline text-yellow-300' href='${apiUrl}' target='_blank'>click here</a>.`;
+        }else{
+          resultDiv.innerHTML = `🔗 If download doesn't start, <a class='underline text-yellow-300' href='${apiUrl}' target='_blank'>click here</a>.`;
+        }
         return;
       }
-      // --- INSTAGRAM ---
+      // INSTAGRAM
       if (site === "instagram") {
         const apiUrl = `https://saveig.app/en/download?url=${encodeURIComponent(url)}`;
-        window.open(apiUrl, '_blank');
-        resultDiv.innerHTML = `🔗 Instagram downloads handled on external site. <a class='underline text-yellow-300' href='${apiUrl}' target='_blank'>Click here</a> if not redirected.`;
+        let win = window.open(apiUrl, '_blank');
+        if(!win){
+          resultDiv.innerHTML = `❗ Popup blocked! Please allow popups for this site. Or <a class='underline text-yellow-300' href='${apiUrl}' target='_blank'>click here</a>.`;
+        }else{
+          resultDiv.innerHTML = `🔗 Instagram downloads handled on external site. <a class='underline text-yellow-300' href='${apiUrl}' target='_blank'>Click here</a> if not redirected.`;
+        }
         return;
       }
       resultDiv.innerHTML = "❌ Only YouTube and Instagram supported!";
