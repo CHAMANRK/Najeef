@@ -1,152 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Universal Video Downloader - YouTube & Instagram</title>
+  <meta charset="utf-8">
+  <title>🌙 Quran Ayat Quiz Game</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-gradient-to-br from-gray-900 to-gray-700 text-white flex flex-col items-center justify-center min-h-screen p-5">
-  <main class="w-full flex flex-col items-center">
-    <div class="w-full text-center p-4 rounded-b-xl bg-gradient-to-r from-yellow-400 to-yellow-600 text-gray-900 font-bold text-2xl shadow-lg">
-      🚀 Universal Video Downloader
+<body>
+<div id="welcomeScreen" class="centered">
+  <h1>🌙 Welcome to the Quran Game</h1>
+  <button class="start-button" onclick="showSection('paraSelectScreen')">▶️ Start Game</button>
+</div>
+
+<div id="paraSelectScreen" class="centered hidden">
+  <div class="quiz-section">
+    <h2>🌙 Para Range Select Karein</h2>
+    <div class="input-group">
+      <label class="input-label" for="fromPara">From Para (1–30):</label>
+      <input id="fromPara" type="number" min="1" max="30" placeholder="e.g. 1">
     </div>
-    <form id="downloaderForm" class="flex flex-col space-y-3 mt-5 w-80 bg-gray-800 p-5 rounded-xl shadow-lg" autocomplete="off">
-      <input id="url" placeholder="Paste YouTube or Instagram link" required class="p-3 rounded text-gray-800 focus:outline-none focus:ring-2 focus:ring-yellow-400" />
-      <select id="site" class="p-3 rounded text-gray-800">
-        <option value="youtube">YouTube</option>
-        <option value="instagram">Instagram</option>
-      </select>
-      <select id="format" class="p-3 rounded text-gray-800">
-        <option value="mp4">mp4 (Video)</option>
-        <option value="mp3">mp3 (Audio, YouTube only)</option>
-      </select>
-      <select id="quality" class="p-3 rounded text-gray-800 hidden"></select>
-      <button type="submit" class="bg-yellow-400 hover:bg-yellow-500 rounded p-3 text-gray-900 font-bold">
-        ⬇️ Download
-      </button>
+    <div class="input-group">
+      <label class="input-label" for="toPara">To Para (1–30):</label>
+      <input id="toPara" type="number" min="1" max="30" placeholder="e.g. 30">
+    </div>
+    <button class="submit-button" onclick="startGame()">Submit</button>
+    <div id="selectError" class="error hidden"></div>
+  </div>
+</div>
+
+<div id="quizScreen" class="centered hidden">
+  <div class="quiz-section">
+    <h2>📖 Ye Ayat Pehchaniye</h2>
+    <div id="ayatText" class="ayat"></div>
+    <form id="answerForm" onsubmit="return checkAnswer();">
+      <div class="input-group">
+        <label class="input-label" for="user_page">Page Number (Optional)</label>
+        <input id="user_page" type="number" min="1" max="604" placeholder="Page Number">
+      </div>
+      <div class="input-group">
+        <label class="input-label" for="user_para">Para Number</label>
+        <input id="user_para" type="number" min="1" max="30" placeholder="Para Number">
+      </div>
+      <div class="input-group">
+        <label class="input-label" for="user_page_in_para">Page In Para</label>
+        <input id="user_page_in_para" type="number" min="1" max="20" placeholder="Page In Para">
+      </div>
+      <div class="input-group">
+        <label class="input-label" for="user_surah">Surah Name (Optional)</label>
+        <input id="user_surah" type="text" placeholder="Surah Name">
+      </div>
+      <button class="submit-button" type="submit">Check</button>
     </form>
-    <div id="result" class="mt-5 text-center"></div>
-  </main>
-  <script>
-    const urlInput = document.getElementById('url');
-    const siteInput = document.getElementById('site');
-    const formatInput = document.getElementById('format');
-    const qualityInput = document.getElementById('quality');
-    const resultDiv = document.getElementById('result');
-    const form = document.getElementById('downloaderForm');
-
-    function resetQuality() {
-      qualityInput.innerHTML = '';
-      qualityInput.classList.add('hidden');
-    }
-
-    async function fetchYoutubeQualities(videoURL, format) {
-      resultDiv.innerHTML = '🔎 Fetching qualities...';
-      const apiUrl = `https://api.vevioz.com/api/button/${format}?url=${encodeURIComponent(videoURL)}`;
-      try {
-        const res = await fetch(apiUrl, {mode: 'cors'});
-        const html = await res.text();
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-        const buttons = Array.from(doc.querySelectorAll('.download-mp4, .download-mp3, .download-audio, .download-video'));
-        let opts = [];
-        for (const btn of buttons) {
-          let text = btn.textContent.trim();
-          let href = btn.getAttribute('href');
-          if (href && text) {
-            opts.push({text, href: 'https://api.vevioz.com' + href});
-          }
-        }
-        if (opts.length > 0) {
-          qualityInput.innerHTML = opts.map((x, i) => `<option value="${i}">${x.text}</option>`).join('');
-          qualityInput.classList.remove('hidden');
-          qualityInput.dataset.options = JSON.stringify(opts);
-          resultDiv.innerHTML = '✅ Quality options loaded. Select and download!';
-        } else {
-          resetQuality();
-          resultDiv.innerHTML = '❌ No qualities found. Try another link.';
-        }
-      } catch (err) {
-        resetQuality();
-        resultDiv.innerHTML = '❌ Error fetching qualities. Try again.';
-      }
-    }
-
-    urlInput.addEventListener('change', async function() {
-      const site = siteInput.value;
-      const format = formatInput.value;
-      if (site === 'youtube' && urlInput.value.trim()) {
-        await fetchYoutubeQualities(urlInput.value.trim(), format);
-      } else {
-        resetQuality();
-      }
-    });
-
-    siteInput.addEventListener('change', function() {
-      if (siteInput.value === 'youtube' && urlInput.value.trim()) {
-        fetchYoutubeQualities(urlInput.value.trim(), formatInput.value);
-      } else {
-        resetQuality();
-      }
-    });
-
-    formatInput.addEventListener('change', function() {
-      if (siteInput.value === 'youtube' && urlInput.value.trim()) {
-        fetchYoutubeQualities(urlInput.value.trim(), formatInput.value);
-      } else {
-        resetQuality();
-      }
-    });
-
-    form.onsubmit = async function(e) {
-      e.preventDefault();
-      const url = urlInput.value.trim();
-      const site = siteInput.value;
-      const format = formatInput.value;
-      if (!url) {
-        resultDiv.innerHTML = "❌ Please enter a link!";
-        return;
-      }
-      // YOUTUBE
-      if (site === "youtube") {
-        if (!qualityInput.classList.contains('hidden')) {
-          const opts = JSON.parse(qualityInput.dataset.options || '[]');
-          const selected = qualityInput.selectedIndex;
-          if (opts[selected]) {
-            // Try to open in new tab for download
-            let win = window.open(opts[selected].href, '_blank');
-            if(!win){
-              resultDiv.innerHTML = `❗ Popup blocked! Please allow popups for this site. Or <a class='underline text-yellow-300' href='${opts[selected].href}' target='_blank'>click here</a>.`;
-            }else{
-              resultDiv.innerHTML = `🔗 Download should start automatically. If not, <a class='underline text-yellow-300' href='${opts[selected].href}' target='_blank'>click here</a>.`;
-            }
-            return;
-          }
-        }
-        // fallback
-        const apiUrl = `https://api.vevioz.com/api/button/${format}?url=${encodeURIComponent(url)}`;
-        let win = window.open(apiUrl, '_blank');
-        if(!win){
-          resultDiv.innerHTML = `❗ Popup blocked! Please allow popups for this site. Or <a class='underline text-yellow-300' href='${apiUrl}' target='_blank'>click here</a>.`;
-        }else{
-          resultDiv.innerHTML = `🔗 If download doesn't start, <a class='underline text-yellow-300' href='${apiUrl}' target='_blank'>click here</a>.`;
-        }
-        return;
-      }
-      // INSTAGRAM
-      if (site === "instagram") {
-        const apiUrl = `https://saveig.app/en/download?url=${encodeURIComponent(url)}`;
-        let win = window.open(apiUrl, '_blank');
-        if(!win){
-          resultDiv.innerHTML = `❗ Popup blocked! Please allow popups for this site. Or <a class='underline text-yellow-300' href='${apiUrl}' target='_blank'>click here</a>.`;
-        }else{
-          resultDiv.innerHTML = `🔗 Instagram downloads handled on external site. <a class='underline text-yellow-300' href='${apiUrl}' target='_blank'>Click here</a> if not redirected.`;
-        }
-        return;
-      }
-      resultDiv.innerHTML = "❌ Only YouTube and Instagram supported!";
-    }
-  </script>
+    <div id="quizError" class="error hidden"></div>
+    <div id="quizResult" class="result hidden"></div>
+    <button class="next-button hidden" onclick="nextQuestion()">Agla Sawal</button>
+  </div>
+</div>
+<script src="script.js"></script>
 </body>
 </html>
