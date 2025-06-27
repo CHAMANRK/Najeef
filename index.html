@@ -1,61 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>🌙 Quran Ayat Quiz Game</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>Najeef Game Menu</title>
+  <link rel="stylesheet" href="menu.css">
 </head>
 <body>
-<div id="welcomeScreen" class="centered">
-  <h1>🌙 Welcome to the Quran Game</h1>
-  <button class="start-button" onclick="showSection('paraSelectScreen')">▶️ Start Game</button>
-</div>
-
-<div id="paraSelectScreen" class="centered hidden">
-  <div class="quiz-section">
-    <h2>🌙 Para Range Select Karein</h2>
-    <div class="input-group">
-      <label class="input-label" for="fromPara">From Para (1–30):</label>
-      <input id="fromPara" type="number" min="1" max="30" placeholder="e.g. 1">
-    </div>
-    <div class="input-group">
-      <label class="input-label" for="toPara">To Para (1–30):</label>
-      <input id="toPara" type="number" min="1" max="30" placeholder="e.g. 30">
-    </div>
-    <button class="submit-button" onclick="startGame()">Submit</button>
-    <div id="selectError" class="error hidden"></div>
+  <div class="container">
+    <h1>🎮 Najeef Game World</h1>
+    <ul class="game-list">
+      <li><a href="quran/index.html">1. Quran Quiz</a></li>
+      <li><a href="game1/index.html">2. Future Game 1</a></li>
+      <li><a href="game2/index.html">3. Future Game 2</a></li>
+    </ul>
   </div>
-</div>
-
-<div id="quizScreen" class="centered hidden">
-  <div class="quiz-section">
-    <h2>📖 Ye Ayat Pehchaniye</h2>
-    <div id="ayatText" class="ayat"></div>
-    <form id="answerForm" onsubmit="return checkAnswer();">
-      <div class="input-group">
-        <label class="input-label" for="user_page">Page Number (Optional)</label>
-        <input id="user_page" type="number" min="1" max="604" placeholder="Page Number">
-      </div>
-      <div class="input-group">
-        <label class="input-label" for="user_para">Para Number</label>
-        <input id="user_para" type="number" min="1" max="30" placeholder="Para Number">
-      </div>
-      <div class="input-group">
-        <label class="input-label" for="user_page_in_para">Page In Para</label>
-        <input id="user_page_in_para" type="number" min="1" max="20" placeholder="Page In Para">
-      </div>
-      <div class="input-group">
-        <label class="input-label" for="user_surah">Surah Name (Optional)</label>
-        <input id="user_surah" type="text" placeholder="Surah Name">
-      </div>
-      <button class="submit-button" type="submit">Check</button>
-    </form>
-    <div id="quizError" class="error hidden"></div>
-    <div id="quizResult" class="result hidden"></div>
-    <button class="next-button hidden" onclick="nextQuestion()">Agla Sawal</button>
-  </div>
-</div>
-<script src="script.js"></script>
 </body>
 </html>
