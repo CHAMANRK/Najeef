@@ -132,6 +132,33 @@ function checkAnswer() {
   return false; // Prevent form submit
 }
 
+// SEARCH FEATURE
+function searchAyats() {
+  const input = document.getElementById('searchInput').value.trim().toLowerCase();
+  const resultsDiv = document.getElementById('searchResults');
+  if (!input) {
+    resultsDiv.innerHTML = "<em>Kuch likhiye search ke liye.</em>";
+    return;
+  }
+  // Search in: ayat text, surah name, page number, para number
+  const results = quranData.filter(a =>
+    a.text.toLowerCase().includes(input) ||
+    a.surah_name.toLowerCase().includes(input) ||
+    String(a.page) === input ||
+    String(((a.page-1)/20|0)+1) === input // para calculation
+  );
+  if (results.length === 0) {
+    resultsDiv.innerHTML = "<b>Koi result nahi mila.</b>";
+    return;
+  }
+  resultsDiv.innerHTML = results.map(r =>
+    `<div class="search-result">
+      <b>Ayat:</b> ${r.text} <br>
+      <b>Surah:</b> ${r.surah_name} | <b>Page:</b> ${r.page} | <b>Para:</b> ${((r.page-1)/20|0)+1}
+    </div>`
+  ).join("");
+}
+
 // Load data on page load
 window.addEventListener('DOMContentLoaded', async () => {
   await loadQuranData();

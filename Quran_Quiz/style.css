@@ -111,8 +111,40 @@ input[type="number"]:focus, input[type="text"]:focus {
   background: #ffe3e3;
   border: 2px solid #d9534f;
 }
+.search-section {
+  margin-top: 30px;
+  margin-bottom: 30px;
+  width: 100%;
+  max-width: 520px;
+  text-align: center;
+}
+.search-section input[type="text"] {
+  padding: 10px;
+  font-size: 1rem;
+  border-radius: 7px;
+  border: 2px solid #ffeecf;
+  color: #3d5931;
+  background: #f5f5e9;
+  width: 60%;
+  margin-right: 8px;
+}
+.search-section input[type="text"]:focus {
+  background: #fff;
+  border-color: #3d5931;
+}
+.search-result {
+  background: #232b1a;
+  color: #ffeecf;
+  margin: 12px auto;
+  padding: 13px;
+  border-radius: 7px;
+  border: 1.5px solid #3d5931;
+  max-width: 500px;
+  text-align: left;
+}
 @media (max-width: 600px) {
   .quiz-section { padding: 14px 4px 9px 4px; }
   h1 { font-size: 2.2rem; }
   .ayat { font-size: 1.01rem; }
+  .search-section input[type="text"] { width: 92%; margin-bottom: 8px; }
 }
