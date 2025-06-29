@@ -7,8 +7,16 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div id="welcomeScreen" class="centered">
+<div id="loader" class="loader hidden">Loading Quran Data...</div>
+
+<div id="welcomeScreen" class="centered fade-in">
   <h1>🌙 Welcome to the Quran Game</h1>
+  <!-- MODE SELECTION -->
+  <form id="modeForm" style="margin-bottom:22px;">
+    <label><input type="radio" name="quizMode" value="practice" checked> 🎯 Practice Mode (unlimited)</label><br>
+    <label><input type="radio" name="quizMode" value="timed"> ⏱️ Timed Challenge (10 Qs, 30 sec each)</label><br>
+    <label><input type="radio" name="quizMode" value="survival"> 💥 Survival Mode (wrong = game over)</label>
+  </form>
   <button class="start-button" onclick="showSection('paraSelectScreen')">▶️ Start Game</button>
 </div>
 
@@ -39,8 +47,12 @@
 
 <div id="quizScreen" class="centered hidden">
   <div class="quiz-section">
+    <div id="quizProgress"></div>
     <h2>📖 Ye Ayat Pehchaniye</h2>
     <div id="ayatText" class="ayat"></div>
+    <button id="copyAyatBtn" class="small-button" onclick="copyAyat()" title="Copy Ayat">📋</button>
+    <button id="hintBtn" class="small-button" onclick="showHint()">💡 Hint Do</button>
+    <span id="hintInfo" style="margin-left:9px; font-size:0.98em;"></span>
     <form id="answerForm" onsubmit="return checkAnswer();">
       <div class="input-group">
         <label class="input-label" for="user_page">Page Number (Optional)</label>
@@ -63,8 +75,20 @@
     <div id="quizError" class="error hidden"></div>
     <div id="quizResult" class="result hidden"></div>
     <button class="next-button hidden" onclick="nextQuestion()">Agla Sawal</button>
+    <button class="next-button hidden" id="tryAgainBtn" onclick="restartGame()">Try Again</button>
+    <div id="scoreBoard"></div>
+    <div id="timer" style="margin-top:10px; font-size:1.15em;"></div>
   </div>
 </div>
+
+<div id="resultScreen" class="centered hidden">
+  <div class="quiz-section">
+    <h2>🎉 Quiz Khatam!</h2>
+    <div id="finalResult"></div>
+    <button class="start-button" onclick="restartGame(true)">🏠 Home</button>
+  </div>
+</div>
+
 <script src="script.js"></script>
 </body>
 </html>
