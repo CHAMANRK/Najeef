@@ -1,25 +1,150 @@
-/* Only additions/changes relevant to new features shown below.
-   Keep rest of your CSS as is. Add these at the end if you like. */
-
-#hintBtn:disabled {
-  background: #aaa;
-  cursor: not-allowed;
-  color: #eee;
-}
-#resultScreen .quiz-section {
-  margin-top: 120px;
-}
-#finalResult {
-  font-size: 1.25rem;
-  background: #e8fbe8;
-  color: #27462b;
-  border-radius: 10px;
-  padding: 23px 10px;
-  margin: 20px 0;
-  border: 2px solid #3d5931;
-  box-shadow: 0 2px 6px #2223;
-}
-#timer {
+body {
+  font-family: Arial, sans-serif;
+  margin: 0; padding: 0;
+  background: linear-gradient(135deg, #1a1a1a, #3d5931);
+  min-height: 100vh;
   color: #ffeecf;
+}
+.centered {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  min-height: 100vh;
+  text-align: center;
+}
+.hidden { display: none !important; }
+h1 {
+  font-size: 3.5rem;
+  color: #ffeecf;
+  text-shadow: 3px 3px 8px #000;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0% {transform: scale(1)}
+  50% {transform: scale(1.07)}
+  100% {transform: scale(1)}
+}
+.start-button, .submit-button, .next-button {
+  font-size: 1.25rem;
+  padding: 14px 40px;
+  border-radius: 12px;
+  background: #ffeecf;
+  color: #1a1a1a;
+  border: none;
+  cursor: pointer;
   font-weight: bold;
+  margin: 18px 0 0 0;
+  box-shadow: 0px 0px 15px #ffeecf;
+  transition: background 0.18s, color 0.18s;
+}
+.start-button:hover, .submit-button:hover, .next-button:hover {
+  background: #3d5931;
+  color: #ffeecf;
+}
+.quiz-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 480px;
+  margin: 0 auto;
+  background: rgba(30,35,40,0.94);
+  border-radius: 18px;
+  box-shadow: 0 8px 24px #0006;
+  padding: 38px 20px 28px 20px;
+  margin-top: 40px;
+}
+.quiz-section h2 {
+  color: #ffeecf;
+  font-size: 2rem;
+  margin-bottom: 16px;
+  text-shadow: 1px 1px 4px #3d5931;
+}
+.ayat {
+  font-size: 1.35rem;
+  font-weight: bold;
+  color: #ffeecf;
+  margin: 25px 0;
+  padding: 17px;
+  background: #1a1a1a;
+  border-radius: 12px;
+  border: 2.5px solid #ffeecf;
+}
+.input-group {
+  margin: 11px 0;
+}
+.input-label {
+  display: block;
+  margin-bottom: 5px;
+  color: #ffeecf;
+  font-size: 1.02em;
+  font-weight: bold;
+  text-align: left;
+}
+input[type="number"], input[type="text"] {
+  padding: 12px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 2px solid #ffeecf;
+  text-align: center;
+  background: #3d5931;
+  color: #ffeecf;
+  width: 95%;
+  margin-bottom: 3px;
+}
+input[type="number"]:focus, input[type="text"]:focus {
+  border-color: #ffeecf;
+  outline: none;
+  background: #212b18;
+}
+.result, .error {
+  margin: 25px 0 10px 0;
+  font-size: 1.22rem;
+  border-radius: 8px;
+  padding: 14px 10px;
+}
+.result {
+  color: #3d5931;
+  background: #dfffd3;
+  border: 2px solid #3d5931;
+}
+.error {
+  color: #d9534f;
+  background: #ffe3e3;
+  border: 2px solid #d9534f;
+}
+.search-section {
+  margin-top: 30px;
+  margin-bottom: 30px;
+  width: 100%;
+  max-width: 520px;
+  text-align: center;
+}
+.search-section input[type="text"] {
+  padding: 10px;
+  font-size: 1rem;
+  border-radius: 7px;
+  border: 2px solid #ffeecf;
+  color: #3d5931;
+  background: #f5f5e9;
+  width: 60%;
+  margin-right: 8px;
+}
+.search-section input[type="text"]:focus {
+  background: #fff;
+  border-color: #3d5931;
+}
+.search-result {
+  background: #232b1a;
+  color: #ffeecf;
+  margin: 12px auto;
+  padding: 13px;
+  border-radius: 7px;
+  border: 1.5px solid #3d5931;
+  max-width: 500px;
+  text-align: left;
+}
+@media (max-width: 600px) {
+  .quiz-section { padding: 14px 4px 9px 4px; }
+  h1 { font-size: 2.2rem; }
+  .ayat { font-size: 1.01rem; }
+  .search-section input[type="text"] { width: 92%; margin-bottom: 8px; }
 }
