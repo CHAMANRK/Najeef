@@ -14,12 +14,14 @@ let survivalActive = true;
 let hintCount = 0;
 const maxHints = 2;
 
-// Show/Hide sections
+// Show/Hide sections and search only on welcome
 function showSection(id) {
   ['welcomeScreen', 'paraSelectScreen', 'quizScreen', 'resultScreen'].forEach(sec =>
     document.getElementById(sec).classList.add('hidden')
   );
   document.getElementById(id).classList.remove('hidden');
+  // SEARCH SIRF WELCOME SCREEN PAR
+  document.getElementById('searchSection').classList.toggle('hidden', id !== 'welcomeScreen');
   if(id==='welcomeScreen'){
     resetAll();
   }
@@ -60,7 +62,11 @@ function startGame() {
     errDiv.classList.remove('hidden');
     return;
   }
-  // Filter ayats
+  if (!quranData || quranData.length === 0) {
+    errDiv.textContent = "❌ Quran data abhi load nahi hui. Internet ya file check karein!";
+    errDiv.classList.remove('hidden');
+    return;
+  }
   selectedAyats = quranData.filter(
     a => fromPara <= (((a.page - 1) / 20 | 0) + 1) && (((a.page - 1) / 20 | 0) + 1) <= toPara
   );
@@ -79,6 +85,7 @@ function startGame() {
   hintCount = 0;
   document.getElementById('hintBtn').disabled = false;
   document.getElementById('hintInfo').textContent = `Hint: ${hintCount}/${maxHints}`;
+  document.getElementById('survivalAnswer').classList.add('hidden');
   if (mode === 'timed') totalQuestions = 10;
   else if (mode === 'practice') totalQuestions = 9999;
   else if (mode === 'survival') totalQuestions = 9999, survivalActive = true;
@@ -102,6 +109,7 @@ function randomAyatIndex() {
 function nextQuestion() {
   document.getElementById('quizError').classList.add('hidden');
   document.getElementById('quizResult').classList.add('hidden');
+  document.getElementById('survivalAnswer').classList.add('hidden');
   document.getElementById('answerForm').reset();
   document.querySelector('.next-button').classList.add('hidden');
   document.getElementById('tryAgainBtn').classList.add('hidden');
@@ -148,7 +156,8 @@ function startTimer(seconds) {
       timePerQ.push(seconds);
       showWrong("⏱️ Time's up!");
       if (mode === 'survival') {
-        endQuiz();
+        showSurvivalAnswer();
+        setTimeout(() => endQuiz(), 1900);
       }
       else document.querySelector('.next-button').classList.remove('hidden');
     }
@@ -171,6 +180,7 @@ function checkAnswer() {
   errorDiv.classList.add('hidden');
   resultDiv.classList.add('hidden');
   document.querySelector('.next-button').classList.add('hidden');
+  document.getElementById('survivalAnswer').classList.add('hidden');
   let resultParts = [];
   let page_check = false, para_check = false, page_in_para_check = false, surah_check = true;
 
@@ -235,7 +245,8 @@ function checkAnswer() {
     resultDiv.classList.add('error');
     if(mode==='survival') {
       survivalActive = false;
-      endQuiz();
+      showSurvivalAnswer();
+      setTimeout(() => endQuiz(), 1900);
       return false;
     }
   }
@@ -246,30 +257,18 @@ function checkAnswer() {
   return false; // Prevent form submit
 }
 
-function showWrong(msg) {
-  document.getElementById('quizResult').innerHTML = msg + "<br>❌ 0 Point";
-  document.getElementById('quizResult').classList.remove('result');
-  document.getElementById('quizResult').classList.add('error');
-  document.getElementById('quizResult').classList.remove('hidden');
-  if (mode==='survival') {
-    survivalActive = false;
-    endQuiz();
-  }
-}
-
-// Hint System
-function showHint() {
-  if(hintCount >= maxHints) return;
-  hintCount++;
-  document.getElementById('hintInfo').textContent = `Hint: ${hintCount}/${maxHints}`;
-  if(hintCount >= maxHints) document.getElementById('hintBtn').disabled = true;
-  let surahWords = currentAyat.surah_name.split(" ");
-  let first2 = surahWords.slice(0,2).join(" ");
-  let para = ((parseInt(currentAyat.page)-1)/20|0)+1;
-  document.getElementById('quizError').innerHTML = 
-      `<b>Hint:</b> Surah starts: <b>${first2}...</b>, Para: <b>${para}</b>`;
-  document.getElementById('quizError').classList.remove('hidden');
-  setTimeout(() => document.getElementById('quizError').classList.add('hidden'), 3500);
+// Survival mode wrong answer show
+function showSurvivalAnswer() {
+  let div = document.getElementById('survivalAnswer');
+  let page_num_in_data = parseInt(currentAyat.page);
+  let actual_para_num = ((page_num_in_data - 1) / 20 | 0) + 1;
+  let actual_page_in_para = ((page_num_in_data - 1) % 20) + 1;
+  div.innerHTML = `<b>Sahi Jawab:</b><br>
+  Surah: <b>${currentAyat.surah_name}</b><br>
+  Para: <b>${actual_para_num}</b><br>
+  Page: <b>${page_num_in_data}</b><br>
+  Page in Para: <b>${actual_page_in_para-1}</b>`;
+  div.classList.remove('hidden');
 }
 
 // Show Score/Result at end
@@ -317,7 +316,7 @@ function copyAyat() {
     });
 }
 
-// SEARCH FEATURE
+// SEARCH FEATURE (only on welcome)
 function searchAyats() {
   const input = document.getElementById('searchInput').value.trim().toLowerCase();
   const resultsDiv = document.getElementById('searchResults');
@@ -325,12 +324,11 @@ function searchAyats() {
     resultsDiv.innerHTML = "<em>Kuch likhiye search ke liye.</em>";
     return;
   }
-  // Search in: ayat text, surah name, page number, para number
   const results = quranData.filter(a =>
     a.text.toLowerCase().includes(input) ||
     a.surah_name.toLowerCase().includes(input) ||
     String(a.page) === input ||
-    String(((a.page-1)/20|0)+1) === input // para calculation
+    String(((a.page-1)/20|0)+1) === input
   );
   if (results.length === 0) {
     resultsDiv.innerHTML = "<b>Koi result nahi mila.</b>";
@@ -349,10 +347,15 @@ function highlightAyat(page) {
   alert("Page: " + page + " pe ye ayat hai. (Aap is feature ko customize kar sakte hain)");
 }
 
-// Enter par bhi search ho
+// Enter par bhi search ho (only on welcome)
 document.getElementById('searchInput').addEventListener('keydown', function(e){
   if (e.key === 'Enter') searchAyats();
 });
+
+// Score board update
+function updateScore() {
+  document.getElementById('scoreBoard').innerHTML = `Score: ${score} / ${quizIndex}`;
+}
 
 // Reset all for home
 function resetAll(){
@@ -371,6 +374,3 @@ function resetAll(){
 window.addEventListener('DOMContentLoaded', async () => {
   await loadQuranData();
 });
-function updateScore() {
-  document.getElementById('scoreBoard').innerHTML = `Score: ${score} / ${quizIndex}`;
-}
