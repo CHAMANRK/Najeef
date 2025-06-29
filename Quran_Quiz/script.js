@@ -2,25 +2,52 @@ let quranData = [];
 let currentAyat = null;
 let selectedAyats = [];
 let fromPara = 1, toPara = 30;
+let quizIndex = 0;
+let score = 0;
+let totalQuestions = 10;
+let mode = 'practice';
+let usedIndexes = [];
+let bestSurah = '';
+let surahCorrectCount = {};
+let startTime = 0, totalTime = 0, timer = null, timePerQ = [];
+let survivalActive = true;
+let hintCount = 0;
+const maxHints = 2;
 
 // Show/Hide sections
 function showSection(id) {
-  document.getElementById('welcomeScreen').classList.add('hidden');
-  document.getElementById('paraSelectScreen').classList.add('hidden');
-  document.getElementById('quizScreen').classList.add('hidden');
+  ['welcomeScreen', 'paraSelectScreen', 'quizScreen', 'resultScreen'].forEach(sec =>
+    document.getElementById(sec).classList.add('hidden')
+  );
   document.getElementById(id).classList.remove('hidden');
+  if(id==='welcomeScreen'){
+    resetAll();
+  }
+}
+
+// Loader
+function loader(show=true) {
+  document.getElementById('loader').classList.toggle('hidden', !show);
 }
 
 // Load Quran data from JSON
 async function loadQuranData() {
   try {
+    loader(true);
     const resp = await fetch('quran_full.json');
     if (!resp.ok) throw new Error('Could not load Quran data.');
     quranData = await resp.json();
+    loader(false);
   } catch (e) {
+    loader(false);
     alert('❌ Quran data load error: ' + e.message);
   }
 }
+
+// Handle quiz mode selection
+document.getElementById('modeForm').addEventListener('change', e => {
+  mode = document.querySelector('input[name="quizMode"]:checked').value;
+});
 
 // Start Game: Para range selection
 function startGame() {
@@ -42,8 +69,33 @@ function startGame() {
     errDiv.classList.remove('hidden');
     return;
   }
+  quizIndex = 0;
+  score = 0;
+  usedIndexes = [];
+  bestSurah = '';
+  surahCorrectCount = {};
+  timePerQ = [];
+  totalTime = 0;
+  hintCount = 0;
+  document.getElementById('hintBtn').disabled = false;
+  document.getElementById('hintInfo').textContent = `Hint: ${hintCount}/${maxHints}`;
+  if (mode === 'timed') totalQuestions = 10;
+  else if (mode === 'practice') totalQuestions = 9999;
+  else if (mode === 'survival') totalQuestions = 9999, survivalActive = true;
   nextQuestion();
   showSection('quizScreen');
+  updateScore();
+}
+
+// Prevent repeat questions
+function randomAyatIndex() {
+  if (usedIndexes.length >= Math.min(totalQuestions, selectedAyats.length)) return -1;
+  let i;
+  do {
+    i = Math.floor(Math.random() * selectedAyats.length);
+  } while (usedIndexes.includes(i));
+  usedIndexes.push(i);
+  return i;
 }
 
 // Next random ayat/question
@@ -52,13 +104,63 @@ function nextQuestion() {
   document.getElementById('quizResult').classList.add('hidden');
   document.getElementById('answerForm').reset();
   document.querySelector('.next-button').classList.add('hidden');
-  const i = Math.floor(Math.random() * selectedAyats.length);
+  document.getElementById('tryAgainBtn').classList.add('hidden');
+  document.getElementById('hintBtn').disabled = hintCount >= maxHints;
+  document.getElementById('hintInfo').textContent = `Hint: ${hintCount}/${maxHints}`;
+  if (quizIndex >= totalQuestions || usedIndexes.length >= selectedAyats.length) {
+    endQuiz();
+    return;
+  }
+  const i = randomAyatIndex();
+  if (i === -1) {
+    endQuiz();
+    return;
+  }
   currentAyat = selectedAyats[i];
   document.getElementById('ayatText').textContent = currentAyat.text;
+  quizIndex++;
+  updateScore();
+  document.getElementById('quizProgress').textContent = 
+    mode === 'practice' ? `Practice Mode` : `Sawalat: ${quizIndex} / ${mode==='timed'?totalQuestions:'∞'}`;
+  if (mode === 'timed') {
+    startTimer(30);
+  } else if (mode === 'survival') {
+    document.getElementById('timer').textContent = '';
+    startTime = Date.now();
+  } else {
+    document.getElementById('timer').textContent = '';
+    startTime = Date.now();
+  }
+}
+
+// Timer for Timed mode
+function startTimer(seconds) {
+  let time = seconds;
+  document.getElementById('timer').textContent = `⏱️ ${time}s`;
+  startTime = Date.now();
+  if (timer) clearInterval(timer);
+  timer = setInterval(() => {
+    time--;
+    document.getElementById('timer').textContent = `⏱️ ${time}s`;
+    if (time <= 0) {
+      clearInterval(timer);
+      document.getElementById('timer').textContent = "⏱️ Time's up!";
+      timePerQ.push(seconds);
+      showWrong("⏱️ Time's up!");
+      if (mode === 'survival') {
+        endQuiz();
+      }
+      else document.querySelector('.next-button').classList.remove('hidden');
+    }
+  }, 1000);
 }
 
 // Check user's answer
 function checkAnswer() {
+  let timeSpent = Math.round((Date.now() - startTime)/1000);
+  if (mode === 'timed') {
+    if (timer) clearInterval(timer);
+  }
   const user_page = document.getElementById('user_page').value.trim();
   const user_para = document.getElementById('user_para').value.trim();
   const user_page_in_para = document.getElementById('user_page_in_para').value.trim();
@@ -75,6 +177,7 @@ function checkAnswer() {
   if (!user_page && (!user_para || !user_page_in_para)) {
     errorDiv.textContent = "❌ Kam az kam Page Number ya Para Number + Page In Para likhiye.";
     errorDiv.classList.remove('hidden');
+    setTimeout(()=>errorDiv.classList.add('hidden'), 2300);
     return false;
   }
 
@@ -101,7 +204,6 @@ function checkAnswer() {
     } else {
       resultParts.push(`❌ Para Galat! Sahi: ${actual_para_num}`);
     }
-    // Custom logic: user input + 1 must match actual, result shows actual - 1
     if (user_page_in_para_num + 1 === actual_page_in_para) {
       page_in_para_check = true;
     } else {
@@ -118,18 +220,101 @@ function checkAnswer() {
   }
 
   // Final Result
-  if ((!user_page || page_check) && para_check && page_in_para_check && surah_check) {
-    resultDiv.textContent = "✅ CORRECT ANSWER ✅";
+  let isCorrect = ((!user_page || page_check) && para_check && page_in_para_check && surah_check);
+  if (isCorrect) {
+    score++;
+    // Surah correct count
+    let sname = currentAyat.surah_name;
+    surahCorrectCount[sname] = (surahCorrectCount[sname]||0)+1;
+    resultDiv.textContent = "✅ Sahi! +1 Point";
     resultDiv.classList.remove('hidden', 'error');
     resultDiv.classList.add('result');
-    document.querySelector('.next-button').classList.remove('hidden');
   } else {
-    resultDiv.innerHTML = resultParts.join('<br>') || "❌ Kuch Galat Hai ❌";
+    resultDiv.innerHTML = resultParts.join('<br>') || "❌ Kuch Galat Hai ❌<br> 0 Point";
     resultDiv.classList.remove('hidden', 'result');
     resultDiv.classList.add('error');
-    document.querySelector('.next-button').classList.remove('hidden');
+    if(mode==='survival') {
+      survivalActive = false;
+      endQuiz();
+      return false;
+    }
   }
+  document.querySelector('.next-button').classList.remove('hidden');
+  timePerQ.push(timeSpent);
+  updateScore();
+  setTimeout(() => resultDiv.classList.add('hidden'), 5000);
   return false; // Prevent form submit
+}
+
+function showWrong(msg) {
+  document.getElementById('quizResult').innerHTML = msg + "<br>❌ 0 Point";
+  document.getElementById('quizResult').classList.remove('result');
+  document.getElementById('quizResult').classList.add('error');
+  document.getElementById('quizResult').classList.remove('hidden');
+  if (mode==='survival') {
+    survivalActive = false;
+    endQuiz();
+  }
+}
+
+// Hint System
+function showHint() {
+  if(hintCount >= maxHints) return;
+  hintCount++;
+  document.getElementById('hintInfo').textContent = `Hint: ${hintCount}/${maxHints}`;
+  if(hintCount >= maxHints) document.getElementById('hintBtn').disabled = true;
+  let surahWords = currentAyat.surah_name.split(" ");
+  let first2 = surahWords.slice(0,2).join(" ");
+  let para = ((parseInt(currentAyat.page)-1)/20|0)+1;
+  document.getElementById('quizError').innerHTML = 
+      `<b>Hint:</b> Surah starts: <b>${first2}...</b>, Para: <b>${para}</b>`;
+  document.getElementById('quizError').classList.remove('hidden');
+  setTimeout(() => document.getElementById('quizError').classList.add('hidden'), 3500);
+}
+
+// Show Score/Result at end
+function endQuiz() {
+  if (timer) clearInterval(timer);
+  showSection('resultScreen');
+  let bestSurahName = '';
+  let maxCorrect = 0;
+  Object.entries(surahCorrectCount).forEach(([s,c])=>{
+    if(c>maxCorrect){maxCorrect=c; bestSurahName=s;}
+  });
+  let avgTime = timePerQ.length? Math.round(timePerQ.reduce((a,b)=>a+b,0)/timePerQ.length):0;
+  document.getElementById('finalResult').innerHTML = `
+    🧠 Your Score: <b>${score}/${quizIndex}</b><br>
+    📖 Best Surah: <b>${bestSurahName||'-'}</b><br>
+    ⏱️ Average Time: <b>${avgTime} sec</b><br>
+    <br>${mode==='survival' && !survivalActive ? '💥 Survival Ended!':'🎉 Mubarak!'}
+  `;
+}
+
+// Restart Game
+function restartGame(home=false) {
+  quizIndex = 0;
+  score = 0;
+  usedIndexes = [];
+  bestSurah = '';
+  surahCorrectCount = {};
+  timePerQ = [];
+  totalTime = 0;
+  hintCount = 0;
+  document.getElementById('hintBtn').disabled = false;
+  document.getElementById('hintInfo').textContent = `Hint: ${hintCount}/${maxHints}`;
+  if(home) showSection('welcomeScreen');
+  else showSection('paraSelectScreen');
+}
+
+// Copy Ayat to Clipboard
+function copyAyat() {
+  if (!currentAyat) return;
+  navigator.clipboard.writeText(currentAyat.text)
+    .then(() => {
+      let btn = document.getElementById('copyAyatBtn');
+      btn.textContent = "✅";
+      setTimeout(()=>{ btn.textContent = "📋"; }, 1200);
+    });
 }
 
 // SEARCH FEATURE
@@ -151,12 +336,35 @@ function searchAyats() {
     resultsDiv.innerHTML = "<b>Koi result nahi mila.</b>";
     return;
   }
-  resultsDiv.innerHTML = results.map(r =>
-    `<div class="search-result">
+  resultsDiv.innerHTML = results.map((r, idx) =>
+    `<div class="search-result" onclick="highlightAyat(${r.page})">
       <b>Ayat:</b> ${r.text} <br>
       <b>Surah:</b> ${r.surah_name} | <b>Page:</b> ${r.page} | <b>Para:</b> ${((r.page-1)/20|0)+1}
     </div>`
   ).join("");
+}
+
+// Highlight ayat (optional: show detail popup etc.)
+function highlightAyat(page) {
+  alert("Page: " + page + " pe ye ayat hai. (Aap is feature ko customize kar sakte hain)");
+}
+
+// Enter par bhi search ho
+document.getElementById('searchInput').addEventListener('keydown', function(e){
+  if (e.key === 'Enter') searchAyats();
+});
+
+// Reset all for home
+function resetAll(){
+  quizIndex = 0;
+  score = 0;
+  usedIndexes = [];
+  bestSurah = '';
+  surahCorrectCount = {};
+  timePerQ = [];
+  totalTime = 0;
+  hintCount = 0;
+  mode = document.querySelector('input[name="quizMode"]:checked').value;
 }
 
 // Load data on page load
