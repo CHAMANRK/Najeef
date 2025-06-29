@@ -371,3 +371,6 @@ function resetAll(){
 window.addEventListener('DOMContentLoaded', async () => {
   await loadQuranData();
 });
+function updateScore() {
+  document.getElementById('scoreBoard').innerHTML = `Score: ${score} / ${quizIndex}`;
+}
