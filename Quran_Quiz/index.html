@@ -5,24 +5,39 @@
   <title>🌙 Quran Ayat Quiz Game</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* Only for radio button spacing */
+    #modeForm label {
+      display: block;
+      margin-bottom: 14px;
+      margin-top: 6px;
+      text-align: left;
+      padding-left: 8px;
+    }
+    #modeForm input[type="radio"] {
+      margin-right: 10px;
+      margin-left: 0px;
+      transform: scale(1.22);
+    }
+    /* Hide search outside welcome screen */
+    #searchSection { width:100%; }
+    .hidden { display: none !important; }
+  </style>
 </head>
 <body>
 <div id="loader" class="loader hidden">Loading Quran Data...</div>
 
-<!-- WELCOME + MODE SELECTION -->
+<!-- WELCOME + MODE SELECTION + SEARCH -->
 <div id="welcomeScreen" class="centered fade-in">
   <h1>🌙 Welcome to the Quran Game</h1>
   <form id="modeForm" style="margin-bottom:22px;">
-    <label><input type="radio" name="quizMode" value="practice" checked> 🎯 Practice Mode (unlimited)</label><br>
-    <label><input type="radio" name="quizMode" value="timed"> ⏱️ Timed Challenge (10 Qs, 30 sec each)</label><br>
+    <label><input type="radio" name="quizMode" value="practice" checked> 🎯 Practice Mode (unlimited)</label>
+    <label><input type="radio" name="quizMode" value="timed"> ⏱️ Timed Challenge (10 Qs, 30 sec each)</label>
     <label><input type="radio" name="quizMode" value="survival"> 💥 Survival Mode (wrong = game over)</label>
   </form>
   <button class="start-button" onclick="showSection('paraSelectScreen')">▶️ Start Game</button>
-</div>
-
-<!-- SEARCH SECTION -->
-<div class="centered">
-  <div class="search-section">
+  <!-- SEARCH SIRF YAHAN HAI -->
+  <div id="searchSection" class="search-section" style="margin-top:40px;">
     <input id="searchInput" type="text" placeholder="Ayat, Surah, Page, Para se search karein">
     <button class="submit-button" onclick="searchAyats()">Search</button>
     <div id="searchResults"></div>
@@ -76,6 +91,7 @@
     </form>
     <div id="quizError" class="error hidden"></div>
     <div id="quizResult" class="result hidden"></div>
+    <div id="survivalAnswer" class="result hidden" style="font-size:1.08em; background:#ffeecf; color:#27462b; margin-bottom:12px;"></div>
     <button class="next-button hidden" onclick="nextQuestion()">Agla Sawal</button>
     <button class="next-button hidden" id="tryAgainBtn" onclick="restartGame()">Try Again</button>
     <div id="scoreBoard"></div>
