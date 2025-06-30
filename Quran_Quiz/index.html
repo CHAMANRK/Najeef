@@ -8,7 +8,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <style>
-    /* Quiz mode radio button spacing */
     .mode-group label {
       display: block;
       margin-bottom: 16px;
@@ -21,7 +20,6 @@
       transform: scale(1.16);
       vertical-align: middle;
     }
-    /* Hint style */
     #hintBtn:disabled { background: #aaa; cursor: not-allowed; color: #eee; }
     #hintInfo { color: #b9ffb9; }
     .search-result { cursor: pointer; }
@@ -108,7 +106,7 @@
       <div id="quizProgress"></div>
       <h2 class="main-heading">📖 Ye Ayat Pehchaniye</h2>
       <div id="ayatText" class="ayat typing-effect" aria-live="polite"></div>
-      <div>
+      <div style="margin-bottom: 12px;">
         <button id="hintBtn" class="btn btn-secondary" onclick="showHint()" type="button">💡 Hint Do</button>
         <span id="hintInfo"></span>
       </div>
