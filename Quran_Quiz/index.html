@@ -2,17 +2,21 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>🌙 Najiful85 Quran Game</title>
+  <title>🌙 Najiful Quran Game</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Google Fonts: Scheherazade New for headings, plus fallback -->
+  <!-- Google Fonts: Scheherazade New for headings -->
   <link href="https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header class="app-header" aria-label="App branding">
   <div class="header-content">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Star_and_Crescent.svg/1024px-Star_and_Crescent.svg.png" alt="Quran Game Logo" class="logo" aria-hidden="true" />
-    <h1 class="app-title">Najiful85 Quran Game</h1>
+    <div class="header-branding">
+      <!-- Use your local logo.png file in the same directory -->
+      <img src="logo.png" alt="Quran Game Logo" class="logo" aria-hidden="true" />
+      <h1 class="app-title">Najiful Quran Game</h1>
+    </div>
+    <a href="#" class="header-contact-btn" onclick="showSection('contactScreen')" aria-label="Raabta/Suggestion">📩</a>
   </div>
 </header>
 
@@ -23,7 +27,6 @@
       <h2 class="main-heading">🌙 Quran Ayat Quiz Game</h2>
       <p class="subtitle">Apni Quran maloomat ko aazmaayiye! Para, Surah ya Page se quiz kheliye.</p>
       <button class="btn btn-primary" onclick="showSection('paraSelectScreen')" aria-label="Game shuru karein">▶️ Shuru Karein</button>
-      <button class="btn btn-outline" onclick="showSection('contactScreen')" aria-label="Raabta/Suggestion">📩 Raabta/Suggestion</button>
       <button class="btn btn-secondary" onclick="toggleSearch()" aria-label="Search dikhayein ya chhupayein" id="toggleSearchBtn">🔎 Search</button>
     </div>
     <!-- SEARCH SECTION: hidden by default, toggled by button -->
@@ -95,8 +98,8 @@
   <section id="contactScreen" class="screen" aria-label="Contact/Feedback" tabindex="-1">
     <div class="card contact-card">
       <h2 class="main-heading">📩 Raabta / Feedback</h2>
-      <form action="https://formsubmit.co/your_email@example.com" method="POST" class="contact-form" autocomplete="off">
-        <input type="hidden" name="_next" value="https://yourdomain.com/thankyou.html" />
+      <form action="https://formsubmit.co/hellochaman532@gmail.com" method="POST" class="contact-form" autocomplete="off">
+        <input type="hidden" name="_next" value="https://CHAMANRK.github.io/GAMES/Quran_Quiz/thankyou.html" />
         <input type="hidden" name="_captcha" value="false">
         <div class="input-group">
           <label for="name" class="input-label">Aapka Naam</label>
@@ -118,7 +121,7 @@
 </main>
 
 <footer class="app-footer" aria-label="Copyright">
-  <span>© 2025 Najiful85 Quran Game</span>
+  <span>© 2025 Najiful Quran Game</span>
 </footer>
 
 <script src="script.js"></script>
