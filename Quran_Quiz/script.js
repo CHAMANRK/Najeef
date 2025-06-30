@@ -106,14 +106,11 @@ function nextQuestion() {
   updateScore();
   document.getElementById('quizProgress').textContent =
     mode === 'practice' ? `Practice Mode` : `Sawalat: ${quizIndex} / ${mode==='timed'?totalQuestions:'∞'}`;
+  startTime = Date.now();
   if (mode === 'timed') {
     startTimer(30);
-  } else if (mode === 'survival') {
-    document.getElementById('timer').textContent = '';
-    startTime = Date.now();
   } else {
     document.getElementById('timer').textContent = '';
-    startTime = Date.now();
   }
 }
 
@@ -142,10 +139,8 @@ function startTimer(seconds) {
 
 // Answer check
 function checkAnswer() {
+  if (mode === 'timed' && timer) clearInterval(timer);
   let timeSpent = Math.round((Date.now() - startTime)/1000);
-  if (mode === 'timed') {
-    if (timer) clearInterval(timer);
-  }
   const user_page = document.getElementById('user_page').value.trim();
   const user_para = document.getElementById('user_para').value.trim();
   const user_page_in_para = document.getElementById('user_page_in_para').value.trim();
@@ -222,6 +217,8 @@ function checkAnswer() {
       survivalActive = false;
       showSurvivalAnswer();
       setTimeout(() => endQuiz(), 1900);
+      timePerQ.push(timeSpent);
+      updateScore();
       return false;
     }
   }
@@ -253,7 +250,7 @@ function endQuiz() {
   Object.entries(surahCorrectCount).forEach(([s,c])=>{
     if(c>maxCorrect){maxCorrect=c; bestSurahName=s;}
   });
-  let avgTime = timePerQ.length? Math.round(timePerQ.reduce((a,b)=>a+b,0)/timePerQ.length):0;
+  let avgTime = timePerQ.length ? Math.round(timePerQ.reduce((a,b)=>a+b,0)/timePerQ.length) : 0;
   document.getElementById('finalResult').innerHTML = `
     🧠 Your Score: <b>${score}/${quizIndex}</b><br>
     📖 Best Surah: <b>${bestSurahName||'-'}</b><br>
