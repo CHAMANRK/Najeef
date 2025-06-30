@@ -7,12 +7,47 @@
   <!-- Google Fonts: Scheherazade New for headings -->
   <link href="https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* Quiz mode radio button spacing */
+    .mode-group label {
+      display: block;
+      margin-bottom: 16px;
+      margin-top: 10px;
+      font-size: 1.12em;
+      cursor: pointer;
+    }
+    .mode-group input[type="radio"] {
+      margin-right: 10px;
+      transform: scale(1.16);
+      vertical-align: middle;
+    }
+    /* Hint style */
+    #hintBtn:disabled { background: #aaa; cursor: not-allowed; color: #eee; }
+    #hintInfo { color: #b9ffb9; }
+    .search-result { cursor: pointer; }
+    #quizProgress, #scoreBoard, #timer {
+      color: #ffeecf;
+      font-weight: bold;
+      margin-bottom: 10px;
+      font-size: 1.09em;
+    }
+    .result-summary {
+      color: #27462b;
+      background: #ffeecf;
+      border-radius: 10px;
+      padding: 16px 8px;
+      margin: 20px 0;
+      border: 2px solid #3d5931;
+      box-shadow: 0 2px 6px #2223;
+      font-size: 1.15em;
+    }
+    .hidden { display:none !important; }
+  </style>
 </head>
 <body>
 <header class="app-header" aria-label="App branding">
   <div class="header-content">
     <div class="header-branding">
-      <!-- Use your local logo.png file in the same directory -->
       <img src="logo.png" alt="Quran Game Logo" class="logo" aria-hidden="true" />
       <h1 class="app-title">Najiful Quran Game</h1>
     </div>
@@ -26,6 +61,12 @@
     <div class="card home-card">
       <h2 class="main-heading">🌙 Quran Ayat Quiz Game</h2>
       <p class="subtitle">Apni Quran maloomat ko aazmaayiye! Para, Surah ya Page se quiz kheliye.</p>
+      <!-- MODE SELECTION -->
+      <form id="modeForm" class="mode-group" style="margin-bottom:18px;">
+        <label><input type="radio" name="quizMode" value="practice" checked> 🎯 Practice Mode (unlimited)</label>
+        <label><input type="radio" name="quizMode" value="timed"> ⏱️ Timed Challenge (10 Qs, 30 sec each)</label>
+        <label><input type="radio" name="quizMode" value="survival"> 💥 Survival Mode (wrong = game over)</label>
+      </form>
       <button class="btn btn-primary" onclick="showSection('paraSelectScreen')" aria-label="Game shuru karein">▶️ Shuru Karein</button>
       <button class="btn btn-secondary" onclick="toggleSearch()" aria-label="Search dikhayein ya chhupayein" id="toggleSearchBtn">🔎 Search</button>
     </div>
@@ -64,8 +105,13 @@
   <!-- Quiz Screen -->
   <section id="quizScreen" class="screen" aria-label="Quiz Screen" tabindex="-1">
     <div class="card quiz-card">
+      <div id="quizProgress"></div>
       <h2 class="main-heading">📖 Ye Ayat Pehchaniye</h2>
       <div id="ayatText" class="ayat typing-effect" aria-live="polite"></div>
+      <div>
+        <button id="hintBtn" class="btn btn-secondary" onclick="showHint()" type="button">💡 Hint Do</button>
+        <span id="hintInfo"></span>
+      </div>
       <form id="answerForm" onsubmit="return checkAnswer();" autocomplete="off">
         <div class="input-grid">
           <div class="input-group">
@@ -89,8 +135,20 @@
       </form>
       <div id="quizError" class="error hidden" aria-live="polite"></div>
       <div id="quizResult" class="result hidden" aria-live="polite"></div>
+      <div id="survivalAnswer" class="result hidden" style="font-size:1.08em; background:#ffeecf; color:#27462b; margin-bottom:12px;"></div>
       <button class="btn btn-secondary next-button hidden" onclick="nextQuestion()" aria-label="Agla Sawal">Agla Sawal</button>
       <button class="btn btn-outline" type="button" onclick="showSection('welcomeScreen')" aria-label="Wapas Home">⬅️ Wapas</button>
+      <div id="scoreBoard"></div>
+      <div id="timer" style="font-size:1.11em;margin-top:8px;"></div>
+    </div>
+  </section>
+
+  <!-- RESULT SCREEN/SUMMARY -->
+  <section id="resultScreen" class="screen" aria-label="Result Screen" tabindex="-1">
+    <div class="card quiz-card">
+      <h2 class="main-heading">🎉 Quiz Khatam!</h2>
+      <div id="finalResult" class="result-summary"></div>
+      <button class="btn btn-primary" onclick="restartGame(true)">🏠 Home</button>
     </div>
   </section>
 
@@ -126,22 +184,18 @@
 
 <script src="script.js"></script>
 <script>
-  // Section toggling logic (simple, does not interfere with game logic)
   function showSection(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
-    // Hide search on all except home
     if(id !== "welcomeScreen") {
       document.getElementById("searchContainer").style.display = "none";
       document.getElementById("toggleSearchBtn").innerText = "🔎 Search";
     }
-    // Focus main heading for accessibility
     setTimeout(() => {
       const heading = document.querySelector(`#${id} .main-heading`);
       if(heading) heading.focus();
     }, 200);
   }
-  // Toggle Search box only on Home
   function toggleSearch() {
     const sc = document.getElementById("searchContainer");
     const btn = document.getElementById("toggleSearchBtn");
@@ -154,7 +208,6 @@
       btn.innerText = "🔎 Search";
     }
   }
-  // Typing effect for ayat text (optional, basic demo)
   function ayatTypingEffect(text) {
     const ayatDiv = document.getElementById('ayatText');
     ayatDiv.innerHTML = "";
@@ -163,12 +216,11 @@
       if (i < text.length) {
         ayatDiv.innerHTML += text.charAt(i);
         i++;
-        setTimeout(type, 22); // typing speed
+        setTimeout(type, 22);
       }
     }
     type();
   }
-  // Expose to global for script.js to use if needed
   window.ayatTypingEffect = ayatTypingEffect;
 </script>
 </body>
