@@ -1,3 +1,5 @@
+// Najiful85 Quran Game – Fixed Version
+
 let quranData = [];
 let currentAyat = null;
 let selectedAyats = [];
@@ -16,23 +18,24 @@ const maxHints = 2;
 
 // Show/Hide sections and search only on welcome
 function showSection(id) {
-  ['welcomeScreen', 'paraSelectScreen', 'quizScreen', 'resultScreen'].forEach(sec =>
-    document.getElementById(sec).classList.add('hidden')
+  document.querySelectorAll('.screen').forEach(sec =>
+    sec.classList.remove('active')
   );
-  document.getElementById(id).classList.remove('hidden');
+  document.getElementById(id).classList.add('active');
   // SEARCH SIRF WELCOME SCREEN PAR
-  document.getElementById('searchSection').classList.toggle('hidden', id !== 'welcomeScreen');
-  if(id==='welcomeScreen'){
-    resetAll();
-  }
+  let searchSection = document.getElementById('searchContainer');
+  if (searchSection) searchSection.style.display = (id === 'welcomeScreen') ? 'block' : 'none';
+  let toggleBtn = document.getElementById('toggleSearchBtn');
+  if (toggleBtn && id !== 'welcomeScreen') toggleBtn.innerText = '🔎 Search';
+  if (id === 'welcomeScreen') resetAll();
 }
 
-// Loader
-function loader(show=true) {
-  document.getElementById('loader').classList.toggle('hidden', !show);
+// Loader (optional, not implemented in this UI)
+function loader(show = true) {
+  // If you want to show a loader, implement here
 }
 
-// Load Quran data from JSON
+// Load Quran data from JSON (uses local file, works on GitHub Pages)
 async function loadQuranData() {
   try {
     loader(true);
@@ -45,11 +48,6 @@ async function loadQuranData() {
     alert('❌ Quran data load error: ' + e.message);
   }
 }
-
-// Handle quiz mode selection
-document.getElementById('modeForm').addEventListener('change', e => {
-  mode = document.querySelector('input[name="quizMode"]:checked').value;
-});
 
 // Start Game: Para range selection
 function startGame() {
@@ -83,9 +81,13 @@ function startGame() {
   timePerQ = [];
   totalTime = 0;
   hintCount = 0;
-  document.getElementById('hintBtn').disabled = false;
-  document.getElementById('hintInfo').textContent = `Hint: ${hintCount}/${maxHints}`;
-  document.getElementById('survivalAnswer').classList.add('hidden');
+  // Hint button and info (optional, hide if not present)
+  let hintBtn = document.getElementById('hintBtn');
+  let hintInfo = document.getElementById('hintInfo');
+  if (hintBtn) hintBtn.disabled = false;
+  if (hintInfo) hintInfo.textContent = `Hint: ${hintCount}/${maxHints}`;
+  let survivalAnswer = document.getElementById('survivalAnswer');
+  if (survivalAnswer) survivalAnswer.classList.add('hidden');
   if (mode === 'timed') totalQuestions = 10;
   else if (mode === 'practice') totalQuestions = 9999;
   else if (mode === 'survival') totalQuestions = 9999, survivalActive = true;
@@ -107,14 +109,22 @@ function randomAyatIndex() {
 
 // Next random ayat/question
 function nextQuestion() {
-  document.getElementById('quizError').classList.add('hidden');
-  document.getElementById('quizResult').classList.add('hidden');
-  document.getElementById('survivalAnswer').classList.add('hidden');
-  document.getElementById('answerForm').reset();
-  document.querySelector('.next-button').classList.add('hidden');
-  document.getElementById('tryAgainBtn').classList.add('hidden');
-  document.getElementById('hintBtn').disabled = hintCount >= maxHints;
-  document.getElementById('hintInfo').textContent = `Hint: ${hintCount}/${maxHints}`;
+  let quizError = document.getElementById('quizError');
+  let quizResult = document.getElementById('quizResult');
+  let survivalAnswer = document.getElementById('survivalAnswer');
+  let answerForm = document.getElementById('answerForm');
+  let nextBtn = document.querySelector('.next-button');
+  let tryAgainBtn = document.getElementById('tryAgainBtn');
+  let hintBtn = document.getElementById('hintBtn');
+  let hintInfo = document.getElementById('hintInfo');
+  if (quizError) quizError.classList.add('hidden');
+  if (quizResult) quizResult.classList.add('hidden');
+  if (survivalAnswer) survivalAnswer.classList.add('hidden');
+  if (answerForm) answerForm.reset();
+  if (nextBtn) nextBtn.classList.add('hidden');
+  if (tryAgainBtn) tryAgainBtn.classList.add('hidden');
+  if (hintBtn) hintBtn.disabled = hintCount >= maxHints;
+  if (hintInfo) hintInfo.textContent = `Hint: ${hintCount}/${maxHints}`;
   if (quizIndex >= totalQuestions || usedIndexes.length >= selectedAyats.length) {
     endQuiz();
     return;
@@ -125,18 +135,21 @@ function nextQuestion() {
     return;
   }
   currentAyat = selectedAyats[i];
-  document.getElementById('ayatText').textContent = currentAyat.text;
+  // Typing effect if available, else fallback
+  if (window.ayatTypingEffect) window.ayatTypingEffect(currentAyat.text);
+  else document.getElementById('ayatText').textContent = currentAyat.text;
   quizIndex++;
   updateScore();
-  document.getElementById('quizProgress').textContent = 
-    mode === 'practice' ? `Practice Mode` : `Sawalat: ${quizIndex} / ${mode==='timed'?totalQuestions:'∞'}`;
+  let quizProgress = document.getElementById('quizProgress');
+  if (quizProgress)
+    quizProgress.textContent = mode === 'practice'
+      ? `Practice Mode`
+      : `Sawalat: ${quizIndex} / ${mode === 'timed' ? totalQuestions : '∞'}`;
+  let timerDiv = document.getElementById('timer');
   if (mode === 'timed') {
     startTimer(30);
-  } else if (mode === 'survival') {
-    document.getElementById('timer').textContent = '';
-    startTime = Date.now();
-  } else {
-    document.getElementById('timer').textContent = '';
+  } else if (timerDiv) {
+    timerDiv.textContent = '';
     startTime = Date.now();
   }
 }
@@ -144,15 +157,16 @@ function nextQuestion() {
 // Timer for Timed mode
 function startTimer(seconds) {
   let time = seconds;
-  document.getElementById('timer').textContent = `⏱️ ${time}s`;
+  let timerDiv = document.getElementById('timer');
+  timerDiv.textContent = `⏱️ ${time}s`;
   startTime = Date.now();
   if (timer) clearInterval(timer);
   timer = setInterval(() => {
     time--;
-    document.getElementById('timer').textContent = `⏱️ ${time}s`;
+    timerDiv.textContent = `⏱️ ${time}s`;
     if (time <= 0) {
       clearInterval(timer);
-      document.getElementById('timer').textContent = "⏱️ Time's up!";
+      timerDiv.textContent = "⏱️ Time's up!";
       timePerQ.push(seconds);
       showWrong("⏱️ Time's up!");
       if (mode === 'survival') {
@@ -164,9 +178,19 @@ function startTimer(seconds) {
   }, 1000);
 }
 
+// Show wrong answer (timed mode)
+function showWrong(msg) {
+  let quizResult = document.getElementById('quizResult');
+  quizResult.innerHTML = msg;
+  quizResult.classList.remove('hidden', 'result');
+  quizResult.classList.add('error');
+  document.querySelector('.next-button').classList.remove('hidden');
+  setTimeout(() => quizResult.classList.add('hidden'), 5000);
+}
+
 // Check user's answer
 function checkAnswer() {
-  let timeSpent = Math.round((Date.now() - startTime)/1000);
+  let timeSpent = Math.round((Date.now() - startTime) / 1000);
   if (mode === 'timed') {
     if (timer) clearInterval(timer);
   }
@@ -180,14 +204,15 @@ function checkAnswer() {
   errorDiv.classList.add('hidden');
   resultDiv.classList.add('hidden');
   document.querySelector('.next-button').classList.add('hidden');
-  document.getElementById('survivalAnswer').classList.add('hidden');
+  let survivalAnswer = document.getElementById('survivalAnswer');
+  if (survivalAnswer) survivalAnswer.classList.add('hidden');
   let resultParts = [];
   let page_check = false, para_check = false, page_in_para_check = false, surah_check = true;
 
   if (!user_page && (!user_para || !user_page_in_para)) {
     errorDiv.textContent = "❌ Kam az kam Page Number ya Para Number + Page In Para likhiye.";
     errorDiv.classList.remove('hidden');
-    setTimeout(()=>errorDiv.classList.add('hidden'), 2300);
+    setTimeout(() => errorDiv.classList.add('hidden'), 2300);
     return false;
   }
 
@@ -235,7 +260,7 @@ function checkAnswer() {
     score++;
     // Surah correct count
     let sname = currentAyat.surah_name;
-    surahCorrectCount[sname] = (surahCorrectCount[sname]||0)+1;
+    surahCorrectCount[sname] = (surahCorrectCount[sname] || 0) + 1;
     resultDiv.textContent = "✅ Sahi! +1 Point";
     resultDiv.classList.remove('hidden', 'error');
     resultDiv.classList.add('result');
@@ -243,7 +268,7 @@ function checkAnswer() {
     resultDiv.innerHTML = resultParts.join('<br>') || "❌ Kuch Galat Hai ❌<br> 0 Point";
     resultDiv.classList.remove('hidden', 'result');
     resultDiv.classList.add('error');
-    if(mode==='survival') {
+    if (mode === 'survival') {
       survivalActive = false;
       showSurvivalAnswer();
       setTimeout(() => endQuiz(), 1900);
@@ -267,7 +292,7 @@ function showSurvivalAnswer() {
   Surah: <b>${currentAyat.surah_name}</b><br>
   Para: <b>${actual_para_num}</b><br>
   Page: <b>${page_num_in_data}</b><br>
-  Page in Para: <b>${actual_page_in_para-1}</b>`;
+  Page in Para: <b>${actual_page_in_para - 1}</b>`;
   div.classList.remove('hidden');
 }
 
@@ -277,20 +302,22 @@ function endQuiz() {
   showSection('resultScreen');
   let bestSurahName = '';
   let maxCorrect = 0;
-  Object.entries(surahCorrectCount).forEach(([s,c])=>{
-    if(c>maxCorrect){maxCorrect=c; bestSurahName=s;}
+  Object.entries(surahCorrectCount).forEach(([s, c]) => {
+    if (c > maxCorrect) { maxCorrect = c; bestSurahName = s; }
   });
-  let avgTime = timePerQ.length? Math.round(timePerQ.reduce((a,b)=>a+b,0)/timePerQ.length):0;
-  document.getElementById('finalResult').innerHTML = `
+  let avgTime = timePerQ.length ? Math.round(timePerQ.reduce((a, b) => a + b, 0) / timePerQ.length) : 0;
+  let finalResult = document.getElementById('finalResult');
+  if (finalResult)
+    finalResult.innerHTML = `
     🧠 Your Score: <b>${score}/${quizIndex}</b><br>
-    📖 Best Surah: <b>${bestSurahName||'-'}</b><br>
+    📖 Best Surah: <b>${bestSurahName || '-'}</b><br>
     ⏱️ Average Time: <b>${avgTime} sec</b><br>
-    <br>${mode==='survival' && !survivalActive ? '💥 Survival Ended!':'🎉 Mubarak!'}
+    <br>${mode === 'survival' && !survivalActive ? '💥 Survival Ended!' : '🎉 Mubarak!'}
   `;
 }
 
 // Restart Game
-function restartGame(home=false) {
+function restartGame(home = false) {
   quizIndex = 0;
   score = 0;
   usedIndexes = [];
@@ -299,9 +326,11 @@ function restartGame(home=false) {
   timePerQ = [];
   totalTime = 0;
   hintCount = 0;
-  document.getElementById('hintBtn').disabled = false;
-  document.getElementById('hintInfo').textContent = `Hint: ${hintCount}/${maxHints}`;
-  if(home) showSection('welcomeScreen');
+  let hintBtn = document.getElementById('hintBtn');
+  let hintInfo = document.getElementById('hintInfo');
+  if (hintBtn) hintBtn.disabled = false;
+  if (hintInfo) hintInfo.textContent = `Hint: ${hintCount}/${maxHints}`;
+  if (home) showSection('welcomeScreen');
   else showSection('paraSelectScreen');
 }
 
@@ -311,8 +340,10 @@ function copyAyat() {
   navigator.clipboard.writeText(currentAyat.text)
     .then(() => {
       let btn = document.getElementById('copyAyatBtn');
-      btn.textContent = "✅";
-      setTimeout(()=>{ btn.textContent = "📋"; }, 1200);
+      if (btn) {
+        btn.textContent = "✅";
+        setTimeout(() => { btn.textContent = "📋"; }, 1200);
+      }
     });
 }
 
@@ -328,7 +359,7 @@ function searchAyats() {
     a.text.toLowerCase().includes(input) ||
     a.surah_name.toLowerCase().includes(input) ||
     String(a.page) === input ||
-    String(((a.page-1)/20|0)+1) === input
+    String(((a.page - 1) / 20 | 0) + 1) === input
   );
   if (results.length === 0) {
     resultsDiv.innerHTML = "<b>Koi result nahi mila.</b>";
@@ -337,7 +368,7 @@ function searchAyats() {
   resultsDiv.innerHTML = results.map((r, idx) =>
     `<div class="search-result" onclick="highlightAyat(${r.page})">
       <b>Ayat:</b> ${r.text} <br>
-      <b>Surah:</b> ${r.surah_name} | <b>Page:</b> ${r.page} | <b>Para:</b> ${((r.page-1)/20|0)+1}
+      <b>Surah:</b> ${r.surah_name} | <b>Page:</b> ${r.page} | <b>Para:</b> ${((r.page - 1) / 20 | 0) + 1}
     </div>`
   ).join("");
 }
@@ -348,17 +379,25 @@ function highlightAyat(page) {
 }
 
 // Enter par bhi search ho (only on welcome)
-document.getElementById('searchInput').addEventListener('keydown', function(e){
-  if (e.key === 'Enter') searchAyats();
-});
+let searchInput = document.getElementById('searchInput');
+if (searchInput) {
+  searchInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      searchAyats();
+    }
+  });
+}
 
 // Score board update
 function updateScore() {
-  document.getElementById('scoreBoard').innerHTML = `Score: ${score} / ${quizIndex}`;
+  let scoreBoard = document.getElementById('scoreBoard');
+  if (scoreBoard)
+    scoreBoard.innerHTML = `Score: ${score} / ${quizIndex}`;
 }
 
 // Reset all for home
-function resetAll(){
+function resetAll() {
   quizIndex = 0;
   score = 0;
   usedIndexes = [];
@@ -367,10 +406,14 @@ function resetAll(){
   timePerQ = [];
   totalTime = 0;
   hintCount = 0;
-  mode = document.querySelector('input[name="quizMode"]:checked').value;
+  let radios = document.querySelectorAll('input[name="quizMode"]');
+  if (radios.length) {
+    let checked = Array.from(radios).find(r => r.checked);
+    mode = checked ? checked.value : 'practice';
+  }
 }
 
-// Load data on page load
+// On DOM ready, load Quran data
 window.addEventListener('DOMContentLoaded', async () => {
   await loadQuranData();
 });
