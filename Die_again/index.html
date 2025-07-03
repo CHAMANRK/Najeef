@@ -1,0 +1,116 @@
+<!DOCTYPE html><html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Die & Retry: Impossible Run</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: black;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
+  <script>
+    const config = {
+      type: Phaser.AUTO,
+      width: 800,
+      height: 600,
+      physics: {
+        default: 'arcade',
+        arcade: {
+          gravity: { y: 600 },
+          debug: false
+        }
+      },
+      scene: {
+        preload: preload,
+        create: create,
+        update: update
+      }
+    };const game = new Phaser.Game(config);
+let player, cursors, platforms, traps, deathText;
+let levelData = [
+  { x: 100, y: 550 },
+  { x: 300, y: 500 },
+  { x: 500, y: 450 },
+  { x: 700, y: 400 }
+];
+let trapData = [
+  { x: 200, y: 530, type: 'spike' },
+  { x: 400, y: 480, type: 'arrow' },
+  { x: 600, y: 430, type: 'fake' },
+  { x: 750, y: 380, type: 'falling' }
+];
+
+function preload() {
+  this.load.image('player', 'https://i.imgur.com/T5sjyYy.png');
+  this.load.image('ground', 'https://i.imgur.com/WP7tHNu.png');
+  this.load.image('spike', 'https://i.imgur.com/Y4o2J3Y.png');
+  this.load.image('arrow', 'https://i.imgur.com/fRpsbzi.png');
+  this.load.image('fake', 'https://i.imgur.com/mShJfVk.png');
+  this.load.image('falling', 'https://i.imgur.com/fv3z7ZW.png');
+}
+
+function create() {
+  platforms = this.physics.add.staticGroup();
+  traps = this.physics.add.group();
+
+  levelData.forEach(pos => {
+    platforms.create(pos.x, pos.y, 'ground').setScale(0.5).refreshBody();
+  });
+
+  trapData.forEach(trap => {
+    const t = traps.create(trap.x, trap.y, trap.type);
+    t.type = trap.type;
+    if (trap.type === 'falling') {
+      t.body.allowGravity = false;
+    }
+  });
+
+  player = this.physics.add.sprite(100, 300, 'player').setScale(0.4);
+  player.setCollideWorldBounds(true);
+
+  this.physics.add.collider(player, platforms, (p, plat) => {
+    if (plat.texture.key === 'fake') {
+      plat.destroy();
+    }
+  });
+
+  this.physics.add.collider(player, traps, (p, t) => {
+    die(this);
+  });
+
+  cursors = this.input.keyboard.createCursorKeys();
+
+  deathText = this.add.text(300, 250, '', { fontSize: '40px', fill: '#f00' });
+}
+
+function update() {
+  if (cursors.left.isDown) {
+    player.setVelocityX(-160);
+  } else if (cursors.right.isDown) {
+    player.setVelocityX(160);
+  } else {
+    player.setVelocityX(0);
+  }
+
+  if (cursors.up.isDown && player.body.touching.down) {
+    player.setVelocityY(-400);
+  }
+}
+
+function die(scene) {
+  deathText.setText('💀 YOU DIED 💀');
+  scene.time.delayedCall(1000, () => {
+    scene.scene.restart();
+  });
+}
+
+  </script>
+</body>
+</html>
