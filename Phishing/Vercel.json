@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/save-log", "destination": "/api/save-log" }
+  ]
+}
