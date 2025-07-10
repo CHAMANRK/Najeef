@@ -302,6 +302,7 @@ function removeDiacritics(text) {
 }
 
 // SEARCH FEATURE (only on home)
+// SEARCH FEATURE (only on home)
 function searchAyats() {
   const input = document.getElementById('searchInput').value.trim().toLowerCase();
   const resultsDiv = document.getElementById('searchResults');
@@ -323,7 +324,7 @@ function searchAyats() {
     return;
   }
 
-  // Highlight matched word in yellow
+  // Link to quran.com page with highlighted word
   resultsDiv.innerHTML = results.map((r, idx) => {
     const highlightedText = r.text.replace(
       new RegExp(input, 'gi'),
