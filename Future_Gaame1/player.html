@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Number of Players</title>
+    <link rel="stylesheet" href="players.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Select Number of Players</h1>
+        <div class="button-container">
+            <button class="player-btn" onclick="selectPlayers(2)">2 Players</button>
+            <button class="player-btn" onclick="selectPlayers(3)">3 Players</button>
+            <button class="player-btn" onclick="selectPlayers(4)">4 Players</button>
+        </div>
+    </div>
+
+    <script>
+        function selectPlayers(num) {
+            localStorage.setItem('players', num);
+            window.location.href = 'board.html';
+        }
+    </script>
+</body>
+</html>
