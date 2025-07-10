@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ludo Game Board</title>
+    <link rel="stylesheet" href="board.css">
+</head>
+<body>
+    <div class="dice-container">
+        <button id="roll-dice">Roll Dice</button>
+        <div id="dice-result" class="dice-result">0</div>
+    </div>
+    <div class="board">
+        <div class="red-home home">
+            <div class="token token-red"></div>
+            <div class="token token-red"></div>
+            <div class="token token-red"></div>
+            <div class="token token-red"></div>
+        </div>
+        <div class="blue-home home">
+            <div class="token token-blue"></div>
+            <div class="token token-blue"></div>
+            <div class="token token-blue"></div>
+            <div class="token token-blue"></div>
+        </div>
+        <div class="green-home home">
+            <div class="token token-green"></div>
+            <div class="token token-green"></div>
+            <div class="token token-green"></div>
+            <div class="token token-green"></div>
+        </div>
+        <div class="yellow-home home">
+            <div class="token token-yellow"></div>
+            <div class="token token-yellow"></div>
+            <div class="token token-yellow"></div>
+            <div class="token token-yellow"></div>
+        </div>
+        <div class="center"></div>
+        
+        <!-- Paths -->
+        <div class="path red-path"></div>
+        <div class="path blue-path"></div>
+        <div class="path green-path"></div>
+        <div class="path yellow-path"></div>
+        
+        <!-- Safe Zones -->
+        <div class="safe red-safe"></div>
+        <div class="safe blue-safe"></div>
+        <div class="safe green-safe"></div>
+        <div class="safe yellow-safe"></div>
+    </div>
+    <script src="board.js"></script>
+</body>
+</html>
