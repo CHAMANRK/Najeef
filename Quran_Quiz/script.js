@@ -300,11 +300,15 @@ function updateScore() {
 function removeDiacritics(text) {
   return text.replace(/[\u064B-\u065F\u0670\u06D6-\u06ED]/g, "");
 }
+// Tashkeel (Diacritics) hatane wala function
+function removeDiacritics(text) {
+  return text.replace(/[\u064B-\u065F\u0670\u06D6-\u06ED]/g, "");
+}
 
 // SEARCH FEATURE (only on home)
-// SEARCH FEATURE (only on home)
 function searchAyats() {
-  const input = document.getElementById('searchInput').value.trim().toLowerCase();
+  const inputRaw = document.getElementById('searchInput').value.trim();
+  const input = removeDiacritics(inputRaw.toLowerCase());
   const resultsDiv = document.getElementById('searchResults');
 
   if (!input) {
@@ -313,8 +317,8 @@ function searchAyats() {
   }
 
   const results = quranData.filter(a =>
-    a.text.toLowerCase().includes(input) ||
-    a.surah_name.toLowerCase().includes(input) ||
+    removeDiacritics(a.text.toLowerCase()).includes(input) ||
+    removeDiacritics(a.surah_name.toLowerCase()).includes(input) ||
     String(a.page) === input ||
     String(((a.page - 1) / 20 | 0) + 1) === input
   );
@@ -324,20 +328,39 @@ function searchAyats() {
     return;
   }
 
-  // Link to quran.com page with highlighted word
   resultsDiv.innerHTML = results.map((r, idx) => {
+    const diacriticFreeText = removeDiacritics(r.text.toLowerCase());
+    const diacriticFreeSurah = removeDiacritics(r.surah_name.toLowerCase());
+
     const highlightedText = r.text.replace(
-      new RegExp(input, 'gi'),
+      new RegExp(inputRaw, 'gi'),
       match => `<mark style="background-color: yellow">${match}</mark>`
     );
+
     const highlightedSurah = r.surah_name.replace(
-      new RegExp(input, 'gi'),
+      new RegExp(inputRaw, 'gi'),
       match => `<mark style="background-color: yellow">${match}</mark>`
     );
+
+    // Manual highlight fallback for Tashkeel-insensitive search
+    const safeHighlightedText = diacriticFreeText.includes(input)
+      ? r.text.replace(
+          new RegExp(removeDiacritics(inputRaw), 'gi'),
+          match => `<mark style="background-color: yellow">${match}</mark>`
+        )
+      : r.text;
+
+    const safeHighlightedSurah = diacriticFreeSurah.includes(input)
+      ? r.surah_name.replace(
+          new RegExp(removeDiacritics(inputRaw), 'gi'),
+          match => `<mark style="background-color: yellow">${match}</mark>`
+        )
+      : r.surah_name;
+
     return `
       <div class="search-result" onclick="window.open('https://quran.com/page/${r.page}','_blank');">
-        <b>Ayat:</b> ${highlightedText} <br>
-        <b>Surah:</b> ${highlightedSurah} | <b>Page:</b> ${r.page} | <b>Para:</b> ${((r.page - 1) / 20 | 0) + 1}
+        <b>Ayat:</b> ${safeHighlightedText} <br>
+        <b>Surah:</b> ${safeHighlightedSurah} | <b>Page:</b> ${r.page} | <b>Para:</b> ${((r.page - 1) / 20 | 0) + 1}
         <span style="color:#aad;float:right;font-size:1em;">🔗 Open page</span>
       </div>
     `;
