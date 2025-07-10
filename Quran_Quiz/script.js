@@ -305,35 +305,43 @@ function removeDiacritics(text) {
 function searchAyats() {
   const input = document.getElementById('searchInput').value.trim().toLowerCase();
   const resultsDiv = document.getElementById('searchResults');
+
   if (!input) {
     resultsDiv.innerHTML = "<em>Kuch likhiye search ke liye.</em>";
     return;
   }
-  const cleanInput = removeDiacritics(input);
-  const results = quranData.filter(a => {
-    const cleanText = removeDiacritics(a.text.toLowerCase());
-    const cleanSurah = removeDiacritics(a.surah_name.toLowerCase());
-    return (
-      cleanText.includes(cleanInput) ||
-      cleanSurah.includes(cleanInput) ||
-      String(a.page) === input ||
-      String(((a.page-1)/20|0)+1) === input
-    );
-  });
+
+  const results = quranData.filter(a =>
+    a.text.toLowerCase().includes(input) ||
+    a.surah_name.toLowerCase().includes(input) ||
+    String(a.page) === input ||
+    String(((a.page - 1) / 20 | 0) + 1) === input
+  );
+
   if (results.length === 0) {
     resultsDiv.innerHTML = "<b>Koi result nahi mila.</b>";
     return;
   }
-  // Link to quran.com page
-  resultsDiv.innerHTML = results.map((r, idx) =>
-    `<div class="search-result" onclick="window.open('https://quran.com/page/${r.page}','_blank');">
-      <b>Ayat:</b> ${r.text} <br>
-      <b>Surah:</b> ${r.surah_name} | <b>Page:</b> ${r.page} | <b>Para:</b> ${((r.page-1)/20|0)+1}
-      <span style="color:#aad;float:right;font-size:1em;">&#128279; Open page</span>
-    </div>`
-  ).join("");
-}
 
+  // Highlight matched word in yellow
+  resultsDiv.innerHTML = results.map((r, idx) => {
+    const highlightedText = r.text.replace(
+      new RegExp(input, 'gi'),
+      match => `<mark style="background-color: yellow">${match}</mark>`
+    );
+    const highlightedSurah = r.surah_name.replace(
+      new RegExp(input, 'gi'),
+      match => `<mark style="background-color: yellow">${match}</mark>`
+    );
+    return `
+      <div class="search-result" onclick="window.open('https://quran.com/page/${r.page}','_blank');">
+        <b>Ayat:</b> ${highlightedText} <br>
+        <b>Surah:</b> ${highlightedSurah} | <b>Page:</b> ${r.page} | <b>Para:</b> ${((r.page - 1) / 20 | 0) + 1}
+        <span style="color:#aad;float:right;font-size:1em;">🔗 Open page</span>
+      </div>
+    `;
+  }).join("");
+}
 // Enter par bhi search ho
 document.getElementById('searchInput').addEventListener('keydown', function(e){
   if (e.key === 'Enter') { searchAyats(); e.preventDefault(); }
