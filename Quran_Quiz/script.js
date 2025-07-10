@@ -324,34 +324,19 @@ function searchAyats() {
   }
 
   resultsDiv.innerHTML = results.map(r => {
-    const originalText = r.text;
-    const originalSurah = r.surah_name;
+    const highlightExactWord = (text) => {
+      const words = text.split(/(\s+)/); // preserve spaces
+      return words.map(word => {
+        const wordClean = removeDiacritics(word.toLowerCase());
+        if (wordClean === input) {
+          return `<mark style="background-color: yellow">${word}</mark>`;
+        }
+        return word;
+      }).join('');
+    };
 
-    const diacriticFreeText = removeDiacritics(originalText.toLowerCase());
-    const diacriticFreeSurah = removeDiacritics(originalSurah.toLowerCase());
-
-    const startIndexText = diacriticFreeText.indexOf(input);
-    const startIndexSurah = diacriticFreeSurah.indexOf(input);
-
-    // Highlight in Ayat
-    let highlightedText = originalText;
-    if (startIndexText !== -1) {
-      const matchLength = input.length;
-      const before = originalText.slice(0, startIndexText);
-      const match = originalText.slice(startIndexText, startIndexText + matchLength);
-      const after = originalText.slice(startIndexText + matchLength);
-      highlightedText = `${before}<mark style="background-color: yellow">${match}</mark>${after}`;
-    }
-
-    // Highlight in Surah
-    let highlightedSurah = originalSurah;
-    if (startIndexSurah !== -1) {
-      const matchLength = input.length;
-      const before = originalSurah.slice(0, startIndexSurah);
-      const match = originalSurah.slice(startIndexSurah, startIndexSurah + matchLength);
-      const after = originalSurah.slice(startIndexSurah + matchLength);
-      highlightedSurah = `${before}<mark style="background-color: yellow">${match}</mark>${after}`;
-    }
+    const highlightedText = highlightExactWord(r.text);
+    const highlightedSurah = highlightExactWord(r.surah_name);
 
     return `
       <div class="search-result" onclick="window.open('https://quran.com/page/${r.page}','_blank');">
