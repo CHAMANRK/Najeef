@@ -225,7 +225,95 @@ Instagram : @with_chaman
 <input type="text" class="user_msg" placeholder="say something..."><button class="send_btn"></button>
 </div> -->
 </div>
+<!-- 🔐 Secret Admin Panel -->
+<div id="adminPanel" style="display:none;position:fixed;top:20px;right:20px;width:350px;background:#222;color:#fff;border:2px solid #8800ff;border-radius:12px;z-index:9999;box-shadow:0 4px 24px #0006;padding:22px;">
+  <button id="closeAdminBtn" style="position:absolute;top:5px;right:8px;background:#8800ff;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:16px;padding:2px 8px;">✕</button>
+  <h3>Secret Admin Panel</h3>
 
+  <div>
+    <label>Manual Dice Control:</label><br>
+    <select id="dicePlayerSelect">
+      <option value="RED">Red</option>
+      <option value="GREEN">Green</option>
+      <option value="YELLOW">Yellow</option>
+      <option value="BLUE">Blue</option>
+    </select>
+    <input type="number" min="1" max="6" id="diceValueInput" placeholder="Dice value (1-6)">
+    <button onclick="adminSetDice()">Set Dice</button>
+  </div>
+  <hr>
+
+  <div>
+    <label>Auto Win Mode:</label>
+    <select id="autoWinSelect">
+      <option value="">Off</option>
+      <option value="RED">Red</option>
+      <option value="GREEN">Green</option>
+      <option value="YELLOW">Yellow</option>
+      <option value="BLUE">Blue</option>
+    </select>
+    <button onclick="adminSetAutoWin()">Apply</button>
+  </div>
+  <hr>
+
+  <div>
+    <label>Invincibility:</label>
+    <select id="invinciblePlayerSelect">
+      <option value="RED">Red</option>
+      <option value="GREEN">Green</option>
+      <option value="YELLOW">Yellow</option>
+      <option value="BLUE">Blue</option>
+    </select>
+    <input type="number" min="1" max="4" id="invincibleTokenInput" placeholder="Token #">
+    <button onclick="adminSetInvincible()">Set</button>
+  </div>
+  <hr>
+
+  <div>
+    <label>Teleport Token:</label>
+    <select id="teleportPlayerSelect">
+      <option value="RED">Red</option>
+      <option value="GREEN">Green</option>
+      <option value="YELLOW">Yellow</option>
+      <option value="BLUE">Blue</option>
+    </select>
+    <input type="number" min="1" max="4" id="teleportTokenInput" placeholder="Token #">
+    <input type="number" min="0" max="224" id="teleportCellInput" placeholder="Cell # (0-224)">
+    <button onclick="adminTeleportToken()">Teleport</button>
+  </div>
+  <hr>
+
+  <div>
+    <label>Freeze Player:</label>
+    <select id="freezePlayerSelect">
+      <option value="RED">Red</option>
+      <option value="GREEN">Green</option>
+      <option value="YELLOW">Yellow</option>
+      <option value="BLUE">Blue</option>
+    </select>
+    <button onclick="adminFreezePlayer()">Freeze</button>
+    <button onclick="adminUnfreezePlayer()">Unfreeze</button>
+  </div>
+  <hr>
+
+  <div>
+    <button onclick="showConfetti()">Show Confetti</button>
+    <button onclick="adminTaunt()">Taunt</button>
+  </div>
+</div>
+
+<!-- 📋 Custom Rules Flashcard -->
+<div id="flashcard" style="display:none;position:fixed;bottom:70px;left:25px;background:#fff;color:#222;border:2px solid #08a;border-radius:10px;padding:16px 30px;z-index:8888;box-shadow:0 2px 12px #0003;font-size:18px;min-width:300px;">
+  <strong>Custom Rules:</strong>
+  <div id="rules-list"></div>
+  <small style="font-size:13px;">(Click checkboxes to toggle)</small>
+</div>
+
+<!-- 📌 Rules Button (Fixed Bottom Left) -->
+<button id="customRulesBtn" style="position:fixed;bottom:28px;left:25px;z-index:9000;background:#3887be;color:#fff;border-radius:8px;padding:8px 16px;font-size:16px;border:none;box-shadow:0 2px 8px #0002;cursor:pointer;opacity:0.88;">Rules</button>
+
+<!-- 🎉 Confetti Canvas -->
+<canvas id="confetti-canvas" style="display:none;pointer-events:none;position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:999999;"></canvas>
 </main>
 <script src="assets/js/timer.js?version=<?=time()?>"></script>
 
