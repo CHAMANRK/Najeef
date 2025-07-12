@@ -99,7 +99,24 @@ function adminTaunt() {
 
 // ===== Placeholder Functions (Connect to logic.js if needed) =====
 function adminSetDice() {
-  alert("Manual Dice logic not connected.");
+  const player = document.getElementById("dicePlayerSelect").value;
+  const value = parseInt(document.getElementById("diceValueInput").value);
+
+  if (isNaN(value) || value < 1 || value > 6) {
+    alert("Enter a valid dice value (1 to 6).");
+    return;
+  }
+
+  // Force the dice value without checking turn
+  dice_value = value;
+
+  // Update dice visuals and disable
+  $("#dice").html(`<img src='assets/img/dice${value}.png' class='dice'/>`);
+  $("#dice").attr("disabled", true);
+  $("#dice").css("opacity", "0.5");
+
+  dice_sound.play();
+  console.log(`🎯 Admin forced dice = ${value} for ${player} (ignoring turn)`);
 }
 function adminSetAutoWin() {
   alert("Auto Win logic not connected.");
