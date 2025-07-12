@@ -1,3 +1,21 @@
+const player_list = {
+  red1: red_player_1,
+  red2: red_player_2,
+  red3: red_player_3,
+  red4: red_player_4,
+  green1: green_player_1,
+  green2: green_player_2,
+  green3: green_player_3,
+  green4: green_player_4,
+  blue1: blue_player_1,
+  blue2: blue_player_2,
+  blue3: blue_player_3,
+  blue4: blue_player_4,
+  yellow1: yellow_player_1,
+  yellow2: yellow_player_2,
+  yellow3: yellow_player_3,
+  yellow4: yellow_player_4
+};
 var steps = document.getElementsByClassName("step");
 // for(i=0;i<steps.length;i++){
 //     steps[i].innerText=i;
