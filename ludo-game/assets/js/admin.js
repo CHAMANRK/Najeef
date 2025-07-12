@@ -1,5 +1,3 @@
-// assets/js/admin.js
-
 // ===== Custom Rules =====
 let flashcardVisible = false;
 
@@ -17,14 +15,14 @@ function updateRulesList() {
   ];
   let html = '';
   for (let i = 0; i < window.customRules.length; i++) {
-    html += `<label><input type="checkbox" ${window.customRules[i].enabled ? "checked" : ""} onclick="toggleRule(${i + 1})"> ${ruleNames[i]}</label><br>`;
+    html += `<label><input type="checkbox" ${window.customRules[i].enabled ? "checked" : ""} onclick="toggleRule(${i})"> ${ruleNames[i]}</label><br>`;
   }
   document.getElementById('rules-list').innerHTML = html;
 }
 
 function toggleRule(idx) {
-  if (window.customRules && window.customRules[idx - 1]) {
-    window.customRules[idx - 1].enabled = !window.customRules[idx - 1].enabled;
+  if (window.customRules && window.customRules[idx]) {
+    window.customRules[idx].enabled = !window.customRules[idx].enabled;
     updateRulesList();
   }
 }
@@ -45,7 +43,7 @@ function setupHoldAnywhere() {
   let holdTimer = null;
 
   document.addEventListener('mousedown', () => {
-    holdTimer = setTimeout(showAdminPanel, 5000); // 5 seconds hold
+    holdTimer = setTimeout(showAdminPanel, 5000);
   });
 
   document.addEventListener('mouseup', () => clearTimeout(holdTimer));
@@ -62,6 +60,7 @@ function setupHoldAnywhere() {
 // ===== Confetti Animation =====
 function showConfetti() {
   const canvas = document.getElementById('confetti-canvas');
+  if (!canvas) return;
   canvas.style.display = 'block';
   const ctx = canvas.getContext('2d');
   canvas.width = window.innerWidth;
@@ -97,41 +96,79 @@ function adminTaunt() {
   alert("👑 Admin says: You can't beat me!");
 }
 
-// ===== Placeholder Functions (Connect to logic.js if needed) =====
+// ===== Utility: Get Selected Token ID =====
+function getSelectedTokenId() {
+  return document.getElementById("selectedToken").value; // e.g., "red3"
+}
+
+// ===== Admin Functions =====
+
+// Force Dice (for selected token/player)
 function adminSetDice() {
-  const player = document.getElementById("dicePlayerSelect").value;
+  const tokenId = getSelectedTokenId();
   const value = parseInt(document.getElementById("diceValueInput").value);
 
+  if (!tokenId) {
+    alert("Please select a token/player first.");
+    return;
+  }
   if (isNaN(value) || value < 1 || value > 6) {
     alert("Enter a valid dice value (1 to 6).");
     return;
   }
 
-  // Force the dice value without checking turn
-  dice_value = value;
+  // Call your game logic function (implement this in logic.js)
+  setDiceForToken(tokenId, value);
 
-  // Update dice visuals and disable
   $("#dice").html(`<img src='assets/img/dice${value}.png' class='dice'/>`);
   $("#dice").attr("disabled", true);
   $("#dice").css("opacity", "0.5");
 
-  dice_sound.play();
-  console.log(`🎯 Admin forced dice = ${value} for ${player} (ignoring turn)`);
+  if (typeof dice_sound !== "undefined") dice_sound.play();
+  console.log(`🎯 Admin forced dice = ${value} for ${tokenId}`);
 }
+
+// Auto Win for selected token
 function adminSetAutoWin() {
-  alert("Auto Win logic not connected.");
+  const tokenId = getSelectedTokenId();
+  if (!tokenId) return alert("Please select a token/player first.");
+  autoWinToken(tokenId); // logic.js
+  showConfetti();
+  alert(`Auto Win applied to ${tokenId}`);
 }
+
+// Invincible for selected token
 function adminSetInvincible() {
-  alert("Invincibility logic not connected.");
+  const tokenId = getSelectedTokenId();
+  if (!tokenId) return alert("Please select a token/player first.");
+  setTokenInvincible(tokenId); // logic.js
+  alert(`${tokenId} is now invincible!`);
 }
+
+// Teleport token (to position)
 function adminTeleportToken() {
-  alert("Teleport logic not connected.");
+  const tokenId = getSelectedTokenId();
+  if (!tokenId) return alert("Please select a token/player first.");
+  const pos = prompt("Enter position to teleport to (cell number):");
+  if (!pos || isNaN(pos)) return alert("Enter a valid cell number.");
+  teleportToken(tokenId, parseInt(pos)); // logic.js
+  alert(`${tokenId} teleported to cell ${pos}`);
 }
+
+// Freeze selected token
 function adminFreezePlayer() {
-  alert("Freeze logic not connected.");
+  const tokenId = getSelectedTokenId();
+  if (!tokenId) return alert("Please select a token/player first.");
+  freezeToken(tokenId); // logic.js
+  alert(`${tokenId} is frozen!`);
 }
+
+// Unfreeze selected token
 function adminUnfreezePlayer() {
-  alert("Unfreeze logic not connected.");
+  const tokenId = getSelectedTokenId();
+  if (!tokenId) return alert("Please select a token/player first.");
+  unfreezeToken(tokenId); // logic.js
+  alert(`${tokenId} is now unfrozen!`);
 }
 
 // ===== Auto Setup on Page Load =====
@@ -151,3 +188,12 @@ window.onload = function () {
     };
   }
 };
+
+// ===== Connect to logic.js =====
+// You must implement these functions in your logic.js:
+// - setDiceForToken(tokenId, diceValue)
+// - autoWinToken(tokenId)
+// - setTokenInvincible(tokenId)
+// - teleportToken(tokenId, position)
+// - freezeToken(tokenId)
+// - unfreezeToken(tokenId)
