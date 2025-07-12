@@ -1,4 +1,6 @@
 // assets/js/admin.js
+
+// ===== Custom Rules =====
 let flashcardVisible = false;
 
 window.customRules = [
@@ -27,37 +29,37 @@ function toggleRule(idx) {
   }
 }
 
-// Admin Panel visibility
+// ===== Admin Panel Show/Hide =====
 function showAdminPanel() {
-  document.getElementById('adminPanel').style.display = 'block';
+  const panel = document.getElementById('adminPanel');
+  if (panel) panel.style.display = 'block';
 }
+
 function hideAdminPanel() {
-  document.getElementById('adminPanel').style.display = 'none';
-}
-function setupDiceHold() {
-  const diceBtn = document.getElementById('dice');
-  let diceHoldTimer = null;
-
-  diceBtn.addEventListener('mousedown', () => {
-    diceHoldTimer = setTimeout(showAdminPanel, 5000);
-  });
-  diceBtn.addEventListener('mouseup', () => clearTimeout(diceHoldTimer));
-  diceBtn.addEventListener('mouseleave', () => clearTimeout(diceHoldTimer));
-  diceBtn.addEventListener('touchstart', () => {
-    diceHoldTimer = setTimeout(showAdminPanel, 5000);
-  });
-  diceBtn.addEventListener('touchend', () => clearTimeout(diceHoldTimer));
-  diceBtn.addEventListener('touchcancel', () => clearTimeout(diceHoldTimer));
+  const panel = document.getElementById('adminPanel');
+  if (panel) panel.style.display = 'none';
 }
 
-// Admin Actions (placeholders – implement in logic.js)
-function adminSetDice() {}
-function adminSetAutoWin() {}
-function adminSetInvincible() {}
-function adminTeleportToken() {}
-function adminFreezePlayer() {}
-function adminUnfreezePlayer() {}
+// ===== Long Press Anywhere to Open Admin Panel =====
+function setupHoldAnywhere() {
+  let holdTimer = null;
 
+  document.addEventListener('mousedown', () => {
+    holdTimer = setTimeout(showAdminPanel, 5000); // 5 seconds hold
+  });
+
+  document.addEventListener('mouseup', () => clearTimeout(holdTimer));
+  document.addEventListener('mouseleave', () => clearTimeout(holdTimer));
+
+  document.addEventListener('touchstart', () => {
+    holdTimer = setTimeout(showAdminPanel, 5000);
+  });
+
+  document.addEventListener('touchend', () => clearTimeout(holdTimer));
+  document.addEventListener('touchcancel', () => clearTimeout(holdTimer));
+}
+
+// ===== Confetti Animation =====
 function showConfetti() {
   const canvas = document.getElementById('confetti-canvas');
   canvas.style.display = 'block';
@@ -90,17 +92,45 @@ function showConfetti() {
   animate();
 }
 
+// ===== Fun Taunt Alert =====
 function adminTaunt() {
   alert("👑 Admin says: You can't beat me!");
 }
 
+// ===== Placeholder Functions (Connect to logic.js if needed) =====
+function adminSetDice() {
+  alert("Manual Dice logic not connected.");
+}
+function adminSetAutoWin() {
+  alert("Auto Win logic not connected.");
+}
+function adminSetInvincible() {
+  alert("Invincibility logic not connected.");
+}
+function adminTeleportToken() {
+  alert("Teleport logic not connected.");
+}
+function adminFreezePlayer() {
+  alert("Freeze logic not connected.");
+}
+function adminUnfreezePlayer() {
+  alert("Unfreeze logic not connected.");
+}
+
+// ===== Auto Setup on Page Load =====
 window.onload = function () {
   updateRulesList();
-  setupDiceHold();
-  document.getElementById('closeAdminBtn').onclick = hideAdminPanel;
-  document.getElementById('customRulesBtn').onclick = () => {
-    flashcardVisible = !flashcardVisible;
-    document.getElementById('flashcard').style.display = flashcardVisible ? 'block' : 'none';
-    updateRulesList();
-  };
+  setupHoldAnywhere();
+
+  const closeBtn = document.getElementById('closeAdminBtn');
+  if (closeBtn) closeBtn.onclick = hideAdminPanel;
+
+  const rulesBtn = document.getElementById('customRulesBtn');
+  if (rulesBtn) {
+    rulesBtn.onclick = () => {
+      flashcardVisible = !flashcardVisible;
+      document.getElementById('flashcard').style.display = flashcardVisible ? 'block' : 'none';
+      updateRulesList();
+    };
+  }
 };
