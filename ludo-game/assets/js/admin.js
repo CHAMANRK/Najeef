@@ -1,130 +1,51 @@
 // admin.js - Load this as last script: <script src="assets/js/admin.js?version=1"></script>
 (function(){
+  // Admin Panel को पहले से create करना
+  let adminDiv = document.getElementById('admin-panel99');
+  if(!adminDiv){
+    adminDiv = document.createElement('div');
+    adminDiv.id = 'admin-panel99';
+    Object.assign(adminDiv.style, {
+      display: 'none',
+      position: 'fixed',
+      top: '10%',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      background: 'rgba(30,30,30,0.95)',
+      color: '#fff',
+      padding: '20px 30px',
+      borderRadius: '16px',
+      boxShadow: '0 0 30px #000',
+      zIndex: 999999,
+      fontFamily: 'Arial, sans-serif',
+      maxWidth: '320px'
+    });
+    adminDiv.innerHTML = /* ...previous panel HTML... */ `
+      <h2>🛡️ Ludo Admin Panel</h2>
+      <!-- ...panel content as before... -->
+      <button onclick="document.getElementById('admin-panel99').style.display='none'">Close Panel</button>
+    `;
+    document.body.appendChild(adminDiv);
+  }
+
+  // Secret Button Area Detection - Simple Long Press
+  let timer;
+  document.getElementById('secret-admin-btn').addEventListener('touchstart', function () {
+    timer = setTimeout(function(){
+      adminDiv.style.display = 'block';
+    }, 3000); // 3 seconds long-press
+  });
+
+  document.getElementById('secret-admin-btn').addEventListener('touchend', function () {
+    clearTimeout(timer);
+  });
+
+})
+  ();
+<div id="secret-admin-btn" style="position:fixed;top:0;right:0;width:40px;height:40px;opacity:0;z-index:9999"></div>
 
   // --- Admin Panel Creation ---
-  let adminDiv = document.createElement('div');
-  adminDiv.id = 'admin-panel99';
-  Object.assign(adminDiv.style, {
-    display: 'none',
-    position: 'fixed',
-    top: '10%',
-    left: '50%',
-    transform: 'translateX(-50%)',
-    background: 'rgba(30,30,30,0.95)',
-    color: '#fff',
-    padding: '20px 30px',
-    borderRadius: '16px',
-    boxShadow: '0 0 30px #000',
-    zIndex: 999999,
-    fontFamily: 'Arial, sans-serif',
-    maxWidth: '320px',
-    userSelect: 'none'
-  });
-  adminDiv.innerHTML = `
-    <h2 style="margin-top:0;">🛡️ Ludo Admin Panel</h2>
-
-    <div>
-      <label><b>Force Dice Roll:</b></label><br>
-      Player: 
-      <select id="cheat_player">
-        <option value="red">Red</option>
-        <option value="green">Green</option>
-        <option value="yellow">Yellow</option>
-        <option value="blue">Blue</option>
-      </select>
-      &nbsp; Value:
-      <input type="number" id="cheat_diceval" min="1" max="6" style="width:40px;">
-      <button onclick="window.__setDice()">Set</button>
-    </div>
-    <hr>
-    <div>
-      <b>Auto Win Mode:</b><br>
-      <label><input type="checkbox" id="autowin_red"> Red</label><br>
-      <label><input type="checkbox" id="autowin_green"> Green</label><br>
-      <label><input type="checkbox" id="autowin_yellow"> Yellow</label><br>
-      <label><input type="checkbox" id="autowin_blue"> Blue</label><br>
-    </div>
-    <hr>
-    <div>
-      <b>Teleport Token:</b><br>
-      Token: <select id="cheat_token"></select><br>
-      Cell #: <input type="number" id="cheat_cell" min="0" style="width:60px;" placeholder="0..."><br>
-      <button onclick="window.__teleport()">Teleport</button>
-    </div>
-    <hr>
-    <button style="margin-top:15px;" onclick="document.getElementById('admin-panel99').style.display='none'">Close Panel</button>
-  `;
-
-  document.body.appendChild(adminDiv);
-
-  // --- Populate Token Dropdown when player_list ready ---
-  function fillTokenDropdown() {
-    const sel = document.getElementById('cheat_token');
-    if (!window.player_list) return;
-    sel.innerHTML = "";
-    for (const tokenId in window.player_list) {
-      sel.innerHTML += `<option value="${tokenId}">${tokenId}</option>`;
-    }
-  }
-  let waitPlayerList = setInterval(()=>{
-    if(window.player_list){
-      fillTokenDropdown();
-      clearInterval(waitPlayerList);
-    }
-  }, 1000);
-
-  // --- Secret Admin Panel Mobile Touch Gesture ---
-  // Step 1: Three taps within 2s on secret corner
-  // Step 2: After 1s pause, 5s long press to open panel
-
-  const secretArea = document.createElement('div');
-  Object.assign(secretArea.style, {
-    position: 'fixed',
-    top: '0',
-    right: '0',
-    width: '32px',
-    height: '32px',
-    opacity: '0',
-    zIndex: 9999999,
-    userSelect: 'none',
-    touchAction: 'manipulation',
-  });
-  document.body.appendChild(secretArea);
-
-  let tapCount = 0;
-  let tapTimer = null;
-  let readyForLongPress = false;
-  let longPressTimer = null;
-
-  secretArea.addEventListener('touchend', ()=>{
-    tapCount++;
-    if(tapCount === 1){
-      tapTimer = setTimeout(() => { tapCount=0; }, 2000);
-    }
-    if(tapCount === 3){
-      clearTimeout(tapTimer);
-      tapCount = 0;
-      // Allow 5s long press after 1s delay window  
-      setTimeout(() => { readyForLongPress = true; }, 1000);
-      // 4s time to start long press after 1s wait
-      setTimeout(() => { readyForLongPress = false; }, 5000);
-    }
-  });
-
-  secretArea.addEventListener('touchstart', () => {
-    if(!readyForLongPress) return;
-    longPressTimer = setTimeout(() => {
-      if(readyForLongPress) {
-        adminDiv.style.display = 'block';
-        readyForLongPress = false;
-      }
-    }, 5000); // 5 seconds hold
-  });
-
-  secretArea.addEventListener('touchend', () => {
-    clearTimeout(longPressTimer);
-  });
-
+  
   // --- Manual Dice Control ---
   window.__admin_cheat_dice = null; // hold cheat dice info
 
