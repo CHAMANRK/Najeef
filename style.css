@@ -7,7 +7,7 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
+  background: linear-gradient(135deg, #0a0a0a, #151515);
   color: #ffffff;
   display: flex;
   justify-content: center;
@@ -19,19 +19,19 @@ body {
 .container {
   text-align: center;
   background: rgba(0, 255, 255, 0.05);
-  padding: 40px 60px;
+  padding: 30px 40px;
   border-radius: 20px;
-  box-shadow: 0 0 30px rgba(0, 255, 255, 0.4);
-  max-width: 400px;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+  max-width: 360px;
   width: 90%;
 }
 
 h1 {
-  font-size: 3.2em;
-  color: #00ffff;
-  text-shadow: 0 0 15px #00ffff;
-  margin-bottom: 40px;
-  letter-spacing: 1.5px;
+  font-size: 2.2em;
+  color: #00e6e6;
+  text-shadow: 0 0 10px #00e6e6;
+  margin-bottom: 30px;
+  letter-spacing: 1px;
 }
 
 .menu-list {
@@ -41,43 +41,43 @@ h1 {
 }
 
 .menu-list li {
-  margin: 18px 0;
+  margin: 14px 0;
 }
 
 .menu-list a {
   display: inline-block;
   text-decoration: none;
-  font-size: 1.4em;
+  font-size: 1.1em;
   color: #00ffff;
-  padding: 14px 36px;
-  border: 2px solid #00ffff;
-  border-radius: 12px;
-  transition: all 0.4s ease;
-  box-shadow: 0 0 10px #00ffff;
-  font-weight: 600;
-  background: rgba(0, 255, 255, 0.05);
-  letter-spacing: 0.05em;
+  padding: 10px 24px;
+  border: 1.5px solid #00ffff;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 6px #00ffff;
+  font-weight: 500;
+  background: rgba(0, 255, 255, 0.03);
+  letter-spacing: 0.03em;
 }
 
 .menu-list a:hover,
 .menu-list a:focus {
   background: #00ffff;
   color: #000000;
-  box-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff;
-  transform: scale(1.05);
+  box-shadow: 0 0 16px #00ffff, 0 0 28px #00ffff;
+  transform: scale(1.04);
   outline: none;
 }
 
-/* Add subtle bounce animation on hover */
+/* Bounce Animation */
 @keyframes bounce {
   0%, 100% {
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-5px);
+    transform: translateY(-4px);
   }
 }
 
 .menu-list a:hover {
-  animation: bounce 0.3s;
+  animation: bounce 0.25s;
 }
