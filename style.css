@@ -1,83 +1,77 @@
-/* Reset & base styles */
-* {
-  box-sizing: border-box;
+/* 🔳 Background Video Style */
+#bg-video {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  min-width: 100%;
+  min-height: 100%;
+  object-fit: cover;
+  z-index: -1;
+  filter: brightness(0.6); /* Text readability */
 }
 
+/* 💻 Main Body Styling */
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #0a0a0a, #151515);
+  font-family: 'Segoe UI', sans-serif;
   color: #ffffff;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  user-select: none;
-}
-
-.container {
   text-align: center;
-  background: rgba(0, 255, 255, 0.05);
-  padding: 30px 40px;
-  border-radius: 20px;
-  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-  max-width: 360px;
-  width: 90%;
+  overflow: hidden;
 }
 
+/* 🎯 Content Container */
+.container {
+  z-index: 1;
+}
+
+/* 🎮 Heading Style */
 h1 {
-  font-size: 2.2em;
-  color: #00e6e6;
-  text-shadow: 0 0 10px #00e6e6;
-  margin-bottom: 30px;
-  letter-spacing: 1px;
+  font-size: 3em;
+  color: #00ffff;
+  text-shadow: 0 0 15px #00ffff;
+  margin-bottom: 40px;
+  animation: fadeInDown 1.2s ease-out;
 }
 
+/* 📋 Menu List */
 .menu-list {
   list-style: none;
   padding: 0;
-  margin: 0;
 }
-
 .menu-list li {
-  margin: 14px 0;
+  margin: 20px 0;
 }
-
 .menu-list a {
-  display: inline-block;
   text-decoration: none;
-  font-size: 1.1em;
+  font-size: 1.5em;
   color: #00ffff;
-  padding: 10px 24px;
-  border: 1.5px solid #00ffff;
+  padding: 12px 30px;
+  border: 2px solid #00ffff;
   border-radius: 10px;
-  transition: all 0.3s ease;
-  box-shadow: 0 0 6px #00ffff;
-  font-weight: 500;
-  background: rgba(0, 255, 255, 0.03);
-  letter-spacing: 0.03em;
+  transition: 0.3s;
+  display: inline-block;
+  box-shadow: 0 0 10px #00ffff;
 }
-
-.menu-list a:hover,
-.menu-list a:focus {
+.menu-list a:hover {
   background: #00ffff;
-  color: #000000;
-  box-shadow: 0 0 16px #00ffff, 0 0 28px #00ffff;
-  transform: scale(1.04);
-  outline: none;
+  color: #000;
+  box-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff;
+  transform: scale(1.05);
 }
 
-/* Bounce Animation */
-@keyframes bounce {
-  0%, 100% {
+/* ✨ Entrance Animation */
+@keyframes fadeInDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  100% {
+    opacity: 1;
     transform: translateY(0);
   }
-  50% {
-    transform: translateY(-4px);
-  }
-}
-
-.menu-list a:hover {
-  animation: bounce 0.25s;
 }
